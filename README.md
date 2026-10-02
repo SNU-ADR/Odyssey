@@ -36,11 +36,7 @@ Jaehyun Park,
 
 ## Overview
 
-**Odyssey** is a closed-loop benchmark that evaluates driving planners the way real driving happens: following a navigation route over a long drive, in photorealistic scenes.
-
-- **Route-guided with SD maps** — Instead of ambiguous high-level commands (e.g., "turn right"), planners receive explicit road-level routes from SD maps and must translate them into scene-consistent lane maneuvers.
-- **Long sequences** — Each scenario is reconstructed from a continuous 100-second nuPlan log, far beyond the ~20-second scenarios of prior benchmarks, covering multiple turns, lane changes, traffic lights, and pedestrians.
-- **High visual quality** — Scenes are reconstructed with 3D Gaussian Splatting and refined by a diffusion model, suppressing artifacts and blur at the novel viewpoints visited in closed loop.
+**Odyssey** is a closed-loop driving benchmark with **SD-map route guidance**, **long 100-second scenarios**, and **high-quality 3DGS + diffusion rendering**.
 
 | Rendering | Routing | Source Log | Scenarios |
 | :---: | :---: | :---: | :---: |
