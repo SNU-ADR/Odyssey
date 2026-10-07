@@ -1,0 +1,77 @@
+# python
+*.pyc
+**/__pycache__/
+*/__pycache__/
+__pycache__/
+.pytest_cache/*
+.pydevproject
+ingularity_*.sh
+log/
+visualize/
+# IDE
+.vscode/*
+
+# Pip
+*.egg-info
+
+# files
+*.log
+*.pkl
+*.jpg
+*.pcd
+
+# exp
+exp
+exp/
+
+# data
+dataset
+
+# lsf
+*.bsub
+
+# running scripts
+scripts_dev/*
+
+ckpts/
+
+# exp
+# metric caching, eval results...
+exp_navtest_two_stage/*
+exp_warmup_navsafe_two_stage_extended/*
+
+# weight files...
+*.ckpt
+*.pth
+logs_jh/
+*.sif
+*.def
+monitor*.sh
+monitor.sh
+make_sbatch_files/
+singularity*.sh
+caching*.sh
+debug_command.sh
+job_done.txt
+gz_load.py
+bevdepth_train_ori.sh
+debug.sh
+
+eval*.sh
+!eval_safedrive.sh
+prepro*.sh
+
+!traj_anchor_0.05_2048.pkl
+vis/
+build/
+ops/bev_pool_v2/bev_pool_v2_ext.cpython-39-x86_64-linux-gnu.so
+
+*.png
+
+mmcv/
+temp*.sh
+temp1.sh
+temp.sh
+debug_vis/
+third_party/
+

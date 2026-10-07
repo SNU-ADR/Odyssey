@@ -1,0 +1,32 @@
+# SafeDrive, SD-route version. Weights: ckpts/safedrive_sdroute.ckpt.
+# Extends safedrive_baseline_agent; only the fields below differ. The SD route (120-point ego-local
+# polyline, built by the target builder) becomes 24 segment tokens that the plan queries cross-attend
+# to in every layer of both plan decoders, and the 4-way driving_command it replaces is dropped.
+#
+# 'route_attn' is a new operation_order entry handled by Motion_Decoder_Layer. It is not counted
+# by num_attn (only self_attn / cross_attn / traj_self_attn are), so attn_cfgs keeps its length,
+# and the route block carries its own norms, so no extra 'norm' entry belongs here.
+#
+# The twdac decoder shares Motion_Decoder_Layer but is left alone: its cfg sets no use_sdroute.
+#
+# Caching: the route lives in the target cache under 'route_centerline'. cache_safedrive.sh (step 3)
+# adds it to an existing cache with navsim/planning/script/run_sdroute_backfill.py; a cache built
+# with this config already has it.
+defaults:
+  - safedrive_baseline_agent
+  - _self_
+
+config:
+  use_sdroute: True
+  sdroute_num_heads: 8
+  drop_driving_command: True   # status_feature narrows 8 -> 4 (vel, accel)
+
+  proposal_traj_cfg:
+    transformerlayers:
+      use_sdroute: True
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'route_attn', 'ffn', 'norm']
+
+  SWNet_cfg:
+    transformerlayers:
+      use_sdroute: True
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'route_attn', 'ffn', 'norm']

@@ -1,0 +1,107 @@
+{
+    "Navsim": {
+      "root": "/path/to/NAVSIM/dataset",
+      "annotation": "/path/to/NAVSIM/navsim-main/scripts/navsim_traj.jsonl",
+      "data_augment": false,
+      "repeat_time": 2,
+      "length": 85109
+    },
+    "Navsim_QA": {
+      "root": "/path/to/NAVSIM/dataset",
+      "annotation": "/path/to/NAVSIM/navsim-main/scripts/navsim_pipeline.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 85109
+    },
+    "CODA-LM": {
+      "root": "/path/to/CODA-LM/Val",
+      "annotation": "/path/to/CODA-LM/coda_lm.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 20318
+    },
+    "DriveLM": {
+      "root": "/path/to/nuscenes",
+      "annotation": "/path/to/DriveLM/output_nus.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 4072
+    },
+    "LingoQA": {
+        "root": "/path/to/LingoQA/Action/images",
+        "annotation": "/path/to/LingoQA/dataset_lingoqa.jsonl",
+        "data_augment": false,
+        "repeat_time": 1,
+        "length": 26824
+    },
+    "MAPLM": {
+        "root": "/path/to/MAPLM/maplm_v0.1",
+        "annotation": "/path/to/MAPLM/dataset_maplm.jsonl",
+        "data_augment": false,
+        "repeat_time": 1,
+        "length": 10612
+    },
+    "Nuinstruct": {
+        "root": "/path/to/nuscenes",
+        "annotation": "/path/to/NuInstruct/dataset_nuinstruct.jsonl",
+        "data_augment": false,
+        "repeat_time": 1,
+        "length": 57317
+    },
+    "Omnidrive": {
+      "root": "/path/to/nuscenes",
+      "annotation": "/path/to/Omnidrive/dataset_omnidrive.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 28010
+    },
+    "SUTD": {
+      "root": "/path/to/SUTD/compressed_videos",
+      "annotation": "/path/to/SUTD/dataset_sutd.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 9916
+    },
+    "Talk2Car": {
+      "root": "/path/to/Talk2Car/imgs",
+      "annotation": "/path/to/Talk2Car/talk2car_dataset.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 8079
+    },
+    "NuScenes-QA": {
+      "root": "/path/to/nuscenes",
+      "annotation": "/path/to/NuScenes-QA/dataset_nuscenesqa.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 24988
+    },
+    "Drivegpt4": {
+      "root": "/path/to/Drivegpt4/BDD_X_imgs_select",
+      "annotation": "/path/to/Drivegpt4/drivegpt4.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 26319
+    },
+    "Senna": {
+      "root": "/path/to/nuscenes",
+      "annotation": "/path/to/Senna/dataset_senna.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 27813
+    },
+    "Drama": {
+      "root": "/path/to/Drama/drama_data/combined",
+      "annotation": "/path/to/Drama/drama_data/dataset_drama.jsonl",
+      "data_augment": false,
+      "repeat_time": 1,
+      "length": 16404
+    },
+    "llava": {
+      "root": "/path/to/llava",
+      "annotation": "/path/to/llava/llava_v1_5_mix665k.jsonl",
+      "data_augment": false,
+      "repeat_time": 0.2,
+      "length": 665298
+    }
+}

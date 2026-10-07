@@ -1,0 +1,20 @@
+# LTF, baseline: upstream camera-only TransFuser -- driving command in, no route.
+# Weights: ckpts/ltf_baseline.ckpt.
+#
+# LTF is TransfuserAgent with latent=True: the LiDAR BEV branch is replaced by a learned latent, so
+# no point cloud is read. Everything else is stock TransFuser (use_sdroute and drop_driving_command
+# keep their False defaults), i.e. transfuser_agent.yaml with latent=True.
+_target_: navsim.agents.transfuser.transfuser_agent.TransfuserAgent
+_convert_: 'all'
+
+trajectory_sampling:
+    _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+    _convert_: 'all'
+    time_horizon: 4
+    interval_length: 0.5
+config:
+  _target_: navsim.agents.transfuser.transfuser_config.TransfuserConfig
+  _convert_: 'all'
+  latent: True
+checkpoint_path: null
+lr: 1e-4

@@ -1,0 +1,8 @@
+# SafeDrive_Phase1_Perception_CamOnly that also detects pedestrians (det_pedestrian, see
+# safedrive_config.py). Phase 1 of both baseline and sdroute (phase 1 never reads the route).
+defaults:
+  - SafeDrive_Phase1_Perception_CamOnly
+  - _self_
+
+config:
+  det_pedestrian: True

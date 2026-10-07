@@ -1,0 +1,10 @@
+# SafeDrive, baseline: the phase-3 (end-to-end) model, camera-only, detecting pedestrians too.
+# Weights: ckpts/safedrive_baseline.ckpt.
+# Extends SafeDrive_Phase3_Planner_FullTrain_CamOnly; only det_pedestrian differs (see
+# safedrive_config.py).
+defaults:
+  - SafeDrive_Phase3_Planner_FullTrain_CamOnly
+  - _self_
+
+config:
+  det_pedestrian: True

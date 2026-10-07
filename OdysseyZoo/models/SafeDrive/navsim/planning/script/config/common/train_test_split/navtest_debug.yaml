@@ -1,0 +1,4 @@
+defaults:
+  - scene_filter: navtest_debug
+
+data_split: test

@@ -1,0 +1,40 @@
+# Model weights -- multi-GB, fetched separately
+# anchored to repo roots so nuplan-devkit source dirs of the same name survive
+/models/*/ckpts/
+/models/*/pretrained/
+/models/*/weights/
+*.pth
+*.ckpt
+*.safetensors
+*.caffemodel
+
+# Dataset caches, experiment output, run logs
+/exp/
+/models/*/exp/
+/models/*/exp_smoke/
+/models/*/_smoke/
+/models/*/cache_*/
+/models/SafeDrive/.cache/
+/models/navsim/.cache/
+lightning_logs/
+*.log
+_smoke/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints
+
+# Environments / editors
+.venv/
+venv/
+.vscode/
+.idea/
+*.swp
+.DS_Store

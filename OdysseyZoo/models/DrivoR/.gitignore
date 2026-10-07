@@ -1,0 +1,15 @@
+__pycache__
+*.egg-info
+/weights/
+logs
+Bench2Drive/leaderboard/data
+/exp/
+/pad_workspace/
+/dataset/
+/Bench2DriveZoo/data/
+__pycache__/
+/Bench2Drive/b2d_ipad_multi-gpu-evaluation*/
+/Bench2Drive/leaderboard/data/
+/carla/
+*egg*
+.DS_Store

@@ -1,0 +1,36 @@
+# LTF (camera-only TransFuser), SD-route version: SD route in, driving command removed.
+# Weights: ckpts/ltf_sdroute.ckpt.
+#
+# Differs from ltf_baseline_agent in exactly two things:
+#
+#   use_sdroute          each of the 3 decoder layers gains one route cross-attention
+#                        between its memory cross-attn and its FFN. Depth is unchanged.
+#                        Only the trajectory query attends to the route; the 30 detection
+#                        queries skip that branch (sdroute_on_all_queries=False).
+#   drop_driving_command the command(4) slice of status_feature is sliced off at ingest and
+#                        _status_encoding is built at the reduced width (8 -> 4), so the
+#                        route replaces the command as the routing signal.
+#
+# Both change the parameter set, so this model is trained from scratch, not from a baseline
+# checkpoint. The route branch draws its init from a forked RNG (sdroute_init_seed), so it does
+# not shift the init of any other weight; the narrower _status_encoding does, so the two arms do
+# not start from the same init.
+_target_: navsim.agents.transfuser.transfuser_agent.TransfuserAgent
+_convert_: 'all'
+
+trajectory_sampling:
+    _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+    _convert_: 'all'
+    time_horizon: 4
+    interval_length: 0.5
+config:
+  _target_: navsim.agents.transfuser.transfuser_config.TransfuserConfig
+  _convert_: 'all'
+  latent: True
+  use_sdroute: True
+  sdroute_num_heads: 8
+  sdroute_on_all_queries: False
+  sdroute_init_seed: 0
+  drop_driving_command: True
+checkpoint_path: null
+lr: 1e-4

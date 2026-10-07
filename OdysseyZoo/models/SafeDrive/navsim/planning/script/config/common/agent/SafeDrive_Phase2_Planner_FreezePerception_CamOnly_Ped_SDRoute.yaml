@@ -1,0 +1,22 @@
+# SafeDrive_Phase2_Planner_FreezePerception_CamOnly_Ped + SD-route conditioning, with the same
+# fields as safedrive_sdroute_agent.yaml (see its header for 'route_attn' and the route cache).
+# Phase 2 of sdroute. Phase 1 is SafeDrive_Phase1_Perception_CamOnly_Ped, shared with baseline;
+# phase 3 is safedrive_sdroute_agent.
+defaults:
+  - SafeDrive_Phase2_Planner_FreezePerception_CamOnly_Ped
+  - _self_
+
+config:
+  use_sdroute: True
+  sdroute_num_heads: 8
+  drop_driving_command: True   # status_feature narrows 8 -> 4 (vel, accel)
+
+  proposal_traj_cfg:
+    transformerlayers:
+      use_sdroute: True
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'route_attn', 'ffn', 'norm']
+
+  SWNet_cfg:
+    transformerlayers:
+      use_sdroute: True
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'route_attn', 'ffn', 'norm']

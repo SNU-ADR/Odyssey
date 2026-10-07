@@ -1,0 +1,5 @@
+# Small navtrain slice for smoke tests. See scene_filter/navtrain_debug.yaml.
+defaults:
+  - scene_filter: navtrain_debug
+
+data_split: trainval

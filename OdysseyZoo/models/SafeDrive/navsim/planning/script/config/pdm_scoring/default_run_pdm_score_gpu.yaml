@@ -1,0 +1,31 @@
+hydra:
+  run:
+    dir: ${output_dir}
+  output_subdir: ${output_dir}/code/hydra           # Store hydra's config breakdown here for debugging
+  searchpath:                                       # Only <exp_dir> in these paths are discoverable
+    - pkg://navsim.planning.script.config.common
+  job:
+    chdir: False
+
+defaults:
+  - default_common
+  - default_evaluation
+  - default_scoring_parameters
+  # no default agent: it has to be given on the command line
+  - agent: ???
+  - _self_
+  - override train_test_split: navtest
+
+device: cuda
+
+dataloader:
+  params:
+    batch_size: 64  # number of samples per batch
+    num_workers: 4  # number of workers for data loading
+    pin_memory: true  # pin memory for faster GPU transfer
+    prefetch_factor: 2  # number of samples loaded in advance by each worker
+
+metric_cache_path: ${oc.env:NAVSIM_EXP_ROOT}/metric_cache # path to metric cache
+seed: 0
+checkpoint_path: null
+pred_traj_path: null

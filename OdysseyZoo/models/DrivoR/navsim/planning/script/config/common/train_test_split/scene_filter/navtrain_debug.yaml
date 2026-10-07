@@ -1,0 +1,50 @@
+# Small fixed navtrain subset for smoke tests (train_*.sh <arm> smoke).
+#
+# Same filter settings as navtrain (has_route, 4 history / 10 future frames), so a cache built
+# here has the same structure as a full navtrain cache. Every listed token has all 8 cameras at
+# all 4 history frames, so the subset works with any model's sensor config.
+_target_: navsim.common.dataclasses.SceneFilter
+_convert_: 'all'
+num_history_frames: 4
+num_future_frames: 10
+frame_interval: 1
+has_route: true
+max_scenes: null
+log_names:
+  - '2021.05.12.22.00.38_veh-35_00129_00204'
+  - '2021.05.12.22.28.35_veh-35_01175_02127'
+  - '2021.05.12.23.36.44_veh-35_00712_00774'
+  - '2021.06.07.12.42.11_veh-38_01777_02078'
+  - '2021.05.12.22.00.38_veh-35_01008_01518'
+  - '2021.06.07.12.42.11_veh-38_02445_02843'
+tokens:
+  - 'cf83195e8c965927'
+  - '337f969ae6fc59a2'
+  - 'c7f793a82eea5b00'
+  - 'f28d75d84ad852e5'
+  - 'ba17aba316345b0c'
+  - '71f7df8205985e12'
+  - '18e46e0073b55f64'
+  - 'b79898cc0d8c53d9'
+  - 'f6741cbf60265367'
+  - 'd62991cd615a5815'
+  - 'ff75a396218d522d'
+  - '9c72de0205355276'
+  - 'b03e3d27af805034'
+  - '4a9cbe11665c51ae'
+  - '5f419c85659f58c6'
+  - '68e84cdffbc9555e'
+  - '1e996c1856f35493'
+  - '555ee11cc83a5295'
+  - '9b26a1067bcd59e0'
+  - '1fb127e38c7a5d5b'
+  - '26d7d80685ec554b'
+  - 'febf862b4c6f5dec'
+  - '80e6768e72465e34'
+  - 'f1dc8bf10d4b5e40'
+  - '88d9c9e98a75532a'
+  - '6759d9ecbbe455c6'
+  - '0db8ba4e37a85627'
+  - 'e421e562d5e457b3'
+  - '36de096b823953fc'
+  - '138fabb9cf995749'

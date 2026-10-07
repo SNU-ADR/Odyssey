@@ -1,0 +1,7 @@
+# Every scene of 3 navtest logs (no token filter, so not the navtest token set). Not a reportable
+# number: it only checks that the eval pipeline runs end to end (cache -> score -> csv) in minutes.
+# Use it as SPLIT=navtest_smoke with cache_metric_ltf.sh and eval_ltf.sh.
+defaults:
+  - scene_filter: navtest_smoke
+
+data_split: test

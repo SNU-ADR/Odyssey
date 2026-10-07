@@ -1,0 +1,54 @@
+# ReCogDrive, SD-route version: the SD route replaces the driving command in the planner and in
+# the VLM prompt.
+#
+# Planner: sdroute_encoder.py folds the (120,5) route polyline into one 384-d token that is added to
+# ego_status_encoder's output -- the conditioning every DiT block reads. drop_command removes the
+# 4-way command one-hot from status_feature, so the route token replaces the command as the
+# planner's navigation input.
+# VLM prompt: the navigation line is rewritten from the same route as text (nav_prompt=sdroute_text),
+# e.g. "3. Active navigation command: [TURN RIGHT IN 50 M, THEN TURN LEFT]". The text comes from
+# route_text.py; U-turns are folded into turn left/right by their turn direction. The checkpoints
+# were trained on prompts from this route_text.py; changing it changes the sentences the VLM sees.
+# The prompt pads to 2832 tokens instead of 2800. A route too short to describe keeps the dataset
+# command in the prompt, the only navigation left for it.
+# Online inference needs the route text in features['nav_text']: compute_trajectory builds it from
+# sdroute_cache_path; in closed loop the simulator side supplies it.
+#
+# Trained from scratch. Two checkpoints load with this config:
+#   ckpts/recogdrive_sdroute_il.ckpt   imitation learning, 200 epochs
+#   ckpts/recogdrive_sdroute.ckpt      imitation learning 200 epochs, then GRPO 10 epochs
+_target_: navsim.agents.recogdrive.recogdrive_agent.ReCogDriveAgent
+_convert_: 'all'
+
+trajectory_sampling:
+  _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+  _convert_: 'all'
+  time_horizon: 4
+  interval_length: 0.5
+checkpoint_path: ''
+vlm_path: ''
+cam_type: 'single'
+vlm_type: 'internvl'
+dit_type: 'small'
+sampling_method: 'ddim'
+cache_mode: False
+cache_hidden_state: True
+metric_cache_path: ''
+reference_policy_checkpoint: ''
+vlm_size: 'small'
+train_backbone: false
+grpo: False
+
+# --- the arm. drop_command changes ego_status_encoder's input width, so initialize() refuses a
+# checkpoint trained with the other setting; a checkpoint without sdroute_encoder.* tensors loads
+# with the route encoder freshly initialised.
+use_sdroute: true
+sdroute_init_seed: 0
+drop_command: true
+# --- what fills "3. Active navigation command: [...]" in the VLM prompt (online inference builds it)
+nav_prompt: 'sdroute_text'
+sdroute_cache_path: null   # navtest eval reads <path>/<log>/<token>/sdroute_target.gz; closed loop passes the route in
+
+# --- how this checkpoint was trained (recorded; not read at inference)
+lr: 1e-4
+hidden_state_dtype: 'bfloat16'   # dtype the training cache was written in

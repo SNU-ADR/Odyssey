@@ -1,0 +1,85 @@
+_target_: navsim.agents.safedrive.safedrive_agent.SafeDrive_Agent
+_convert_: 'all'
+
+config:
+  _target_: navsim.agents.safedrive.safedrive_config.SafeDrive_Config
+  _convert_: 'all'
+
+  trajectory_sampling:
+    _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+    _convert_: 'all'
+    time_horizon: 4
+    interval_length: 0.5
+
+  num_bounding_boxes: 49
+  epoch: 60
+
+  agent_vel_weight: 0.1
+
+  plan_anchor_path: 'trajectory_anchors/trajectory_anchors_256_GTRS.npy'
+  num_plan_anchor: 256
+  # pred_pdm_score: True
+
+  # Use BEV Seg multi class
+
+  # Upscaling BEV Seg Resolution
+  lidar_resolution_width: 512
+  lidar_resolution_height: 512
+  bev_pixel_width: 512       # 1024 (512x1024)
+  bev_pixel_height: 512
+  bev_pixel_size: 0.125       # [128x256: 0.25, 256x512: 0.125, 512x1024: 0.0625]
+
+  # LiDAR range
+  lidar_min_x: 0
+  lidar_max_x: 64
+
+  # Predict Future BEV Seg
+  future_bev_frames: 0
+
+  grid_config: {
+            'x' : [0, 64, 1.0],
+            'y' : [-32, 32, 1.0],
+            'z' : [-5, 3, 8],
+            'depth' : [1.0, 70.0, 0.5],
+            'downsample': 16
+        }
+
+  bevformer_encoder:
+    type: BEVFormerEncoder
+    num_layers: 3
+    pc_range: [0, -32.0, -3.0, 64.0, 32.0, 5.0]
+    num_points_in_pillar: 4
+    return_intermediate: False
+    WH_reverse: True
+    transformerlayers:
+      type: BEVFormerLayer
+      attn_cfgs:
+        - type: TemporalSelfAttention
+          embed_dims: 256
+          num_levels: 1
+        - type: MSDeformableAttention3D
+          embed_dims: 256
+          num_points: 8
+          num_levels: 1
+        - type: SpatialCrossAttention
+          pc_range: [0, -32.0, -3.0, 64.0, 32.0, 5.0]
+          embed_dims: 256
+          deformable_attention:
+            type: MSDeformableAttention3D
+            embed_dims: 256
+            num_points: 8
+            num_levels: 1
+      feedforward_channels: 512
+      ffn_dropout: 0.1
+      operation_order: ['self_attn', 'norm', 'lidar_cross_attn', 'cross_attn', 'norm', 'ffn', 'norm']
+
+  x_range: 64.
+  bev_w: 64
+  pc_range: [0, -32, -5, 64, 32, 3]
+
+  dn_detection: True
+
+  no_planning: True
+
+checkpoint_path: null
+lr: 1e-4

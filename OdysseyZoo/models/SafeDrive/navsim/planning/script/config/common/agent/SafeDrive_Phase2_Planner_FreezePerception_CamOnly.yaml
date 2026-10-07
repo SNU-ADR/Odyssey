@@ -1,0 +1,36 @@
+# Camera-only SafeDrive_Phase2_Planner_FreezePerception: use_lidar off and 'lidar_cross_attn' dropped
+# from the BEV encoder; only the fields below differ. See docs/train_eval.md (Camera-only).
+defaults:
+  - SafeDrive_Phase2_Planner_FreezePerception
+  - _self_
+
+config:
+  use_lidar: False
+  # The base config's prefixes (_backbone, _query_embedding, _agent_head, ...) are not
+  # SafeDrive_Model attribute names, so there they freeze only the two BEV-seg heads. These are
+  # the exact top-level module names (matched as whole names), so phase 2 freezes all perception.
+  freeze_perception_prefixes:
+    - ProposalNet_BEV
+    - ins_query_emb
+    - _bev_semantic_head_convnext
+    - future_bev_semantic_head_convnext
+    - ProposalNet_instance
+    - det_cls_branches
+    - det_reg_branches
+    - ins_ref_points
+    - ins_pos_emb_layer
+  bevformer_encoder:
+    transformerlayers:
+      attn_cfgs:
+        - type: TemporalSelfAttention
+          embed_dims: 256
+          num_levels: 1
+        - type: SpatialCrossAttention
+          pc_range: [0, -32.0, -3.0, 64.0, 32.0, 5.0]
+          embed_dims: 256
+          deformable_attention:
+            type: MSDeformableAttention3D
+            embed_dims: 256
+            num_points: 8
+            num_levels: 1
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'ffn', 'norm']

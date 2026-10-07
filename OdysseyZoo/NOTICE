@@ -1,0 +1,211 @@
+OdysseyZoo
+Copyright (c) 2026 Seunghoon Yu
+
+This repository redistributes modified copies of five open-source driving planners, together
+with an SD-route builder and the OpenStreetMap data it reads. Each project keeps its original
+LICENSE file in its own directory. As required by Apache-2.0 section 4(b), the modifications
+are stated below; most modified source files also carry in-line comments explaining the change.
+
+================================================================================
+THIRD-PARTY PROJECTS
+================================================================================
+
+models/navsim            (LTF, the camera-only TransFuser)
+  Origin : https://github.com/autonomousvision/navsim
+  Commit : 0a380a9063d7162ec93d0f51e9990ebac585f720 (2025-10-27)
+  License: Apache-2.0 (models/navsim/LICENSE)
+
+models/DrivoR
+  Origin : https://github.com/valeoai/DrivoR
+  Commit : f02665403df799c1b4ddd8b0d34e073f0555c13a (2026-06-26)
+  License: Apache-2.0 (models/DrivoR/LICENSE)
+  Also contains, as shipped by upstream: nuplan-devkit/ (Apache-2.0, Copyright 2021 Motional;
+  models/DrivoR/nuplan-devkit/LICENSE.txt).
+
+models/DiffusionDrive
+  Origin : https://github.com/hustvl/DiffusionDrive
+  Commit : 9b52ed0ec06b073d82d6f392ab084c7b301c8681 (2025-12-08)
+  License: MIT, Copyright (c) 2024 HUST Vision Lab (models/DiffusionDrive/LICENSE)
+
+models/SafeDrive
+  Origin : https://github.com/SPA-junghokim/SafeDrive
+  Commit : ea7791d6c2ebdeedfb6ed514f080cdfa1675b76f (2026-09-08)
+  License: MIT (models/SafeDrive/LICENSE, upstream's file, which carries DiffusionDrive's
+           copyright line)
+
+models/recogdrive        (ReCogDrive)
+  Origin : https://github.com/xiaomi-research/recogdrive
+  Commit : 6b8d8f5e01346c71094651c81dcaf66405dbc04e (2026-08-18)
+  License: Apache-2.0 (models/recogdrive/LICENSE)
+  Also contains, as shipped by upstream: internvl_chat/ (InternVL) and vqa_evaluation/ (see the
+  LICENSE files inside).
+
+Code adapted from other projects:
+  FourierEmbedding, in navsim/agents/sdroute/route_attention.py of navsim, DrivoR,
+  DiffusionDrive and SafeDrive, and in recogdrive/navsim/agents/recogdrive/sdroute_encoder.py:
+  adapted from QCNet (https://github.com/ZikangZhou/QCNet, layers/fourier_embedding.py),
+  Copyright (c) 2023 Zikang Zhou, Apache-2.0. The notice is repeated in each file.
+  PointsEncoder, in recogdrive/navsim/agents/recogdrive/sdroute_encoder.py: ported from PLUTO
+  (https://github.com/jchengai/pluto, commit b9964b6, src/models/pluto/layers/embedding.py;
+  no license declared upstream). The source is credited at the top of the file.
+
+Data:
+  sdroute/assets/osm_raw_<city>.json -- road network of the four nuPlan cities, extracted from
+  OpenStreetMap through the Overpass API (OSM base 2026-07-28).
+  (c) OpenStreetMap contributors. Available under the Open Database License (ODbL) 1.0:
+  https://www.openstreetmap.org/copyright
+
+Original works of this repository (not derived from the projects above): README.md, NOTICE,
+train.sh, cache.sh, sdroute/*.py (the SD-route builder), and,
+apart from FourierEmbedding, navsim/agents/sdroute/ in each project.
+
+NOT INCLUDED: model weights (ckpts/), pretrained backbones, dataset and metric caches.
+
+================================================================================
+MODIFICATIONS
+================================================================================
+
+Every project gains an SD-route version next to its baseline: NAVSIM's 4-way driving_command
+is removed and a standard-definition route (a 120-point ego-frame polyline built by sdroute/)
+is the only navigation signal. The route switch is off by default, so each project's
+baseline path is the upstream model. Configs are named <model>_{baseline,sdroute}_agent.
+
+Added to navsim, DrivoR, DiffusionDrive and SafeDrive (identical in all four):
+  navsim/agents/sdroute/__init__.py
+  navsim/agents/sdroute/route_attention.py    route tokens + gated cross-attention
+  navsim/agents/sdroute/route_target.py       loads sdroute/ and builds the route tensor
+
+--------------------------------------------------------------------------------
+models/navsim (LTF)
+  Added
+    ltf_baseline_agent.yaml (upstream LTF: TransFuser with latent=True), ltf_sdroute_agent.yaml;
+    navtrain_debug and navtest_smoke splits; cache_ltf.sh, cache_metric_ltf.sh, train_ltf.sh,
+    eval_ltf.sh, smoke_env.sh.
+  Modified
+    agents/transfuser/transfuser_{agent,config,features,model}.py: SD-route input
+      (use_sdroute, drop_driving_command); the eval path rebuilds the route from the Scene.
+    agents/abstract_agent.py, planning/training/agent_lightning_module.py,
+    agents/transfuser/transfuser_callback.py: forward() may receive the targets, which carry the
+      route (forward_takes_targets, off by default); the callback tolerates a missing
+      lidar_feature (latent mode) and plots at most one batch of samples.
+    planning/script/run_training.py, config/training/default_training.yaml: resume_ckpt_path.
+    README.md, docs/: links to removed files point to upstream at the commit above;
+      docs/splits.md notes which split configs ship.
+  Removed (55 files): README images, submission tooling and docs, scripts/, tutorial/, the
+    human agent, the constant-velocity traffic policy, unused builders/utils/callbacks and
+    splits, CI and lint configs.
+
+--------------------------------------------------------------------------------
+models/DrivoR
+  Added
+    drivor_baseline_agent.yaml (upstream drivoR.yaml, renamed, with use_sdroute and
+    drop_driving_command set explicitly off), drivor_sdroute_agent.yaml;
+    navtrain_debug split; cache_drivor.sh, cache_metric_drivor.sh, train_drivor.sh,
+    eval_drivor.sh, smoke_env.sh.
+  Modified
+    agents/drivoR/{drivor_agent,drivor_features,drivor_model,transformer_decoder}.py,
+    planning/training/agent_lightning_module.py: SD-route input (off by default).
+    agents/drivoR/drivor_features.py, drivor_model.py: images cached as uint8; the ImageNet
+      normalisation moved into the model (same fp32 values).
+    agents/drivoR/drivor_agent.py: scores computed in fp32 under bf16 training; Ray pool sized
+      per GPU (DRIVOR_RAY_WORKERS_PER_GPU); SimScale synthetic metric caches removed.
+    planning/utils/multithreading/worker_ray_no_torch.py: under DDP one Ray head per node,
+      which the other ranks attach to (upstream started one per rank).
+    agents/drivoR/score_module/{compute_navsim_score,scorer}.py,
+    config/common/default_{common,evaluation}.yaml: dead code and synthetic-data configs removed.
+    agents/abstract_agent.py: the get_training_callbacks docstring example points to DrivoRAgent
+      (training/callbacks/ removed).
+    config/{training,pdm_scoring} defaults, README.md, docs/{agents,cache,metrics}.md,
+      scripts/viz/*: agent name drivor_baseline_agent; links to removed files point to upstream
+      at the commit above.
+  Removed (85 files): SimScale/synthetic data support, submission tooling and docs, tutorial/,
+    unused modules and configs.
+
+--------------------------------------------------------------------------------
+models/DiffusionDrive
+  Added
+    diffusiondrive_baseline_agent.yaml (upstream diffusiondrive_agent.yaml, renamed, with
+    latent: True, i.e. camera-only), diffusiondrive_sdroute_agent.yaml; assets/kmeans_navsim_traj_20.npy (the 20 trajectory
+    anchors the checkpoints were trained with); navtrain_debug split; cache_diffusiondrive.sh,
+    cache_metric_diffusiondrive.sh, train_diffusiondrive.sh, eval_diffusiondrive.sh,
+    smoke_env.sh.
+  Modified
+    agents/diffusiondrive/transfuser_{agent,config,features,model_v2}.py: SD-route input (off by
+      default); anchor and backbone paths default to the vendored anchors and the timm hub.
+    agents/diffusiondrive/transfuser_backbone.py, transfuser_features.py, transfuser_model_v2.py:
+      a clear error when the timm backbone weights cannot be loaded; in latent (camera-only) mode
+      lidar_feature is neither built nor read.
+    agents/diffusiondrive/modules/scheduler.py: drop the `verbose` argument that newer PyTorch
+      LR schedulers no longer accept.
+    config/{training,pdm_scoring} defaults, docs/train_eval.md: agent name
+      diffusiondrive_baseline_agent; docs/train_eval.md also gains an OdysseyZoo note.
+    requirements.txt: diffusers, einops.
+    README.md: images load from upstream at the commit above.
+  Removed (47 files): README images, the TransFuser/CV/MLP agents, submission tooling,
+    scripts/, tutorial/, unused splits.
+
+--------------------------------------------------------------------------------
+models/SafeDrive
+  Its baseline is the paper's phase-3 model made camera-only and extended to detect pedestrians
+  (safedrive_baseline_agent). The paper's camera + LiDAR model stays trainable and evaluable, and a
+  camera-only vehicle variant is added. Only phase-3 checkpoints are released.
+  Added
+    safedrive_baseline_agent.yaml, safedrive_sdroute_agent.yaml, and the *_CamOnly(_Ped)(_SDRoute)
+    phase configs they build on; train_safedrive.sh, cache_safedrive.sh, eval_safedrive.sh,
+    cache_metric_safedrive.sh (replacing upstream's train.sh, cache.sh, test.sh);
+    planning/script/run_sdroute_backfill.py; agents/safedrive/inference_compat.py;
+    .odyssey-safedrive-patch.json (the record that Odyssey's scripts/apply_safedrive_patch.py writes
+    after applying its patch; SafeDrive itself does not read it).
+  Modified
+    SD-route input: modules/decoder_motion.py, modules/transformer_motion.py,
+      safedrive_{model,features,config}.py (route cross-attention in both plan decoders; off by
+      default).
+    Camera-only (use_lidar): safedrive_{config,backbone,features,model,agent}.py,
+      modules/transformer_encoder.py, planning/script/run_training.py.
+    Pedestrian detection (det_pedestrian): safedrive_{config,model,loss,callback}.py.
+    Infrastructure: images cached as uint8 or as paths (safedrive_features.py,
+      abstract_agent.py, run_training.py); vectorised detection targets, denoising prep and
+      per-camera attention (safedrive_loss.py, safedrive_model.py,
+      modules/spatial_cross_attention.py -- same math; CUDA index_add sums cameras in no fixed
+      order); only the three cameras read are loaded (safedrive_agent.py); BEV argmax kept on
+      CPU during validation (planning/training/agent_lightning_module.py); optional
+      save-before-validation checkpoint (run_training.py); top-k query writes through a padded
+      scatter and BEV point sampling under a TF32-off context manager (safedrive_model.py,
+      modules/encoder.py, helpers in inference_compat.py); `from __future__ import annotations`
+      in several modules; no default backbone weights path (upstream's pointed into a home
+      directory) and a clear error when timm cannot fetch them (safedrive_{config,backbone}.py).
+    Phase2/Phase3 yamls, README.md, docs/install.md, docs/train_eval.md, requirements.txt,
+      .gitignore: comments, release instructions, mmdet/spconv pins; README images load from
+      upstream at the commit above; .gitignore drops upstream's local helper entries and keeps
+      eval_safedrive.sh tracked.
+  Removed: make_anchors.sh (the anchors ship), docs/preprocess.md (folded into
+    docs/train_eval.md), figure/*.png, safedrive_visualize.py, scripts/evaluation/run_metric_caching.sh.
+
+--------------------------------------------------------------------------------
+models/recogdrive (ReCogDrive)
+  Its SD-route version enters differently: the route becomes one token added to the planner's
+  ego-status conditioning, and the VLM prompt's navigation line is written from the route as
+  text; only a route too short to describe (~0.1% of navtrain) falls back to the command.
+  Added
+    agents/recogdrive/sdroute_encoder.py (see above), agents/recogdrive/route_text.py;
+    recogdrive_sdroute_agent.yaml; scripts/sdroute/*.
+  Modified
+    SD-route input: agents/recogdrive/recogdrive_{agent,diffusion_planner,features,backbone}.py,
+      planning/script/run_training_recogdrive{,_rl}.py, run_recogdrive_accelerate.py,
+      planning/training/{agent_lightning_module,dataset}.py.
+    Fixes: run_pdm_score_recogdrive.py trims each rank's gathered score bytes to that rank's own
+      length (rank 0's length was applied to every rank) and passes the Scene when the agent
+      needs it; the planner casts its inputs to the parameter dtype (bf16 under DeepSpeed);
+      initialize() fails on a mismatched checkpoint instead of skipping tensors; the "unknown"
+      driving command (one-hot slot 3) reads "unknown" in the VLM prompt instead of raising
+      IndexError.
+    Infrastructure: checkpoint and wandb settings in config/training/default_training.yaml;
+      run_training_recogdrive.py calls agent.initialize(), so imitation learning also loads
+      agent.checkpoint_path; PDM_DIST_BACKEND=gloo for ranks sharing a GPU
+      (run_pdm_score_recogdrive.py, run_training_recogdrive_rl.py); TQDM progress bar;
+      torch.load(weights_only=False) for torch >= 2.6; hidden-state caching under no_grad;
+      optional bf16 hidden-state cache; LiDAR loading turned off (never read).
+    recogdrive_baseline_agent.yaml: upstream recogdrive_agent.yaml, renamed, with the SD-route
+      keys added (all off); scripts/**: agent=recogdrive_baseline_agent.
+  Removed: committed __pycache__/*.pyc files, assets/.DS_Store, .gitattributes (Git LFS rules)
+    and assets/images/framework.jpg (an unreferenced LFS pointer; the README uses framework.png).

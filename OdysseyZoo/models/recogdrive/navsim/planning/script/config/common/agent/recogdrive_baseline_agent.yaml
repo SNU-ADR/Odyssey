@@ -1,0 +1,42 @@
+# ReCogDrive, baseline: the released model -- driving command in the planner and in the VLM
+# prompt, no route. Weights: ckpts/recogdrive_baseline.ckpt.
+_target_: navsim.agents.recogdrive.recogdrive_agent.ReCogDriveAgent
+_convert_: 'all'
+
+trajectory_sampling:
+  _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+  _convert_: 'all'
+  time_horizon: 4
+  interval_length: 0.5
+checkpoint_path: ''
+vlm_path: ''
+cam_type: 'single'
+vlm_type: 'internvl'
+dit_type: 'small'
+sampling_method: 'ddim'
+cache_mode: False
+cache_hidden_state: True
+metric_cache_path: ''
+reference_policy_checkpoint: ''
+vlm_size: 'small'
+train_backbone: false
+grpo: False
+lr: 1e-4
+# SD route conditioning. Training reads <token>/sdroute_target.gz from cache_path, evaluation from
+# sdroute_cache_path.
+use_sdroute: false
+sdroute_cache_path: null   # route cache root <path>/<log>/<token>/sdroute_target.gz (eval; caching with nav_prompt=sdroute_text)
+sdroute_init_seed: 0
+# Drop the 4-way command one-hot from the ego-status input (velocity + acceleration only).
+# Requires the 'mlp' ego-status encoder; see drop_command in recogdrive_diffusion_planner.py.
+drop_command: false
+# What fills "3. Active navigation command: [...]" in the VLM prompt.
+#   command      : the dataset's 3-way command, e.g. [GO STRAIGHT] (released model)
+#   sdroute_text : SimLingo-style text from the SD route (route_text.py), e.g.
+#                  [TURN RIGHT IN 50 M, THEN TURN LEFT]; reads the route from sdroute_cache_path.
+# Only matters where the prompt is built: hidden-state caching and online (cache_hidden_state=False)
+# evaluation. Training on a cache uses whatever prompt the cache was built with.
+nav_prompt: 'command'
+# dtype of last_hidden_state written by hidden-state caching; 'bfloat16' is lossless (the VLM runs
+# in bf16) and halves loader RAM.
+hidden_state_dtype: 'float32'

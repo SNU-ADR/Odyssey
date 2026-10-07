@@ -1,0 +1,11 @@
+_target_: navsim.agents.qwen_agent.QwenVLAgent
+_convert_: 'all'
+
+trajectory_sampling:
+  _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+  _convert_: 'all'
+  time_horizon: 4
+  interval_length: 0.5
+checkpoint_path: ''
+prompt_type: 'base'
+cam_type: 'single'

@@ -1,0 +1,23 @@
+# Camera-only SafeDrive_Phase1_Perception: use_lidar off and 'lidar_cross_attn' dropped
+# from the BEV encoder; only the fields below differ. See docs/train_eval.md (Camera-only).
+defaults:
+  - SafeDrive_Phase1_Perception
+  - _self_
+
+config:
+  use_lidar: False
+  bevformer_encoder:
+    transformerlayers:
+      attn_cfgs:
+        - type: TemporalSelfAttention
+          embed_dims: 256
+          num_levels: 1
+        - type: SpatialCrossAttention
+          pc_range: [0, -32.0, -3.0, 64.0, 32.0, 5.0]
+          embed_dims: 256
+          deformable_attention:
+            type: MSDeformableAttention3D
+            embed_dims: 256
+            num_points: 8
+            num_levels: 1
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'ffn', 'norm']

@@ -1,0 +1,44 @@
+# DiffusionDrive, SD-route version: route cross-attention inside the diffusion decoder, driving command
+# dropped. Weights: ckpts/diffusiondrive_sdroute.ckpt.
+#
+# The route (120,5) is folded into 24 segment tokens (5 points each, SDRouteSegmentEncoder, encoded
+# once and shared), and each of the 2 diffusion decoder layers (CustomTransformerDecoderLayer) gets a
+# new zero-gated cross-attention where the trajectory query reads those tokens. Placement: after the
+# layer's cross_ego attention and before its FFN, i.e.
+#     cross_bev -> cross_agent -> norm1 -> cross_ego -> norm2 -> [route CA] -> FFN -> time_mod
+# The route CA is self-contained (pre-norm + gated residual) with a zero-init gate, so it is an
+# exact no-op at step 0 and the route's contribution grows from zero (the same design as the other
+# SD-route models).
+#
+# The route replaces the driving_command (drop_driving_command=True): the command slice is dropped so
+# the route is the only routing signal. diffusiondrive_baseline_agent.yaml keeps the command. This,
+# not the route CA, is why the arm differs from the baseline at step 0.
+#
+# Changes parameter shapes (route encoder + per-layer route CA + narrowed status Linear), so it is
+# not loadable from a stock diffusiondrive checkpoint. Train from scratch, same seed.
+#
+# latent: True = camera-only (LiDAR branch replaced by a learned latent), which is how the shipped
+# ckpt was trained; a latent mismatch fails the strict ckpt load (`_backbone.lidar_latent`).
+_target_: navsim.agents.diffusiondrive.transfuser_agent.TransfuserAgent
+_convert_: 'all'
+
+config:
+  _target_: navsim.agents.diffusiondrive.transfuser_config.TransfuserConfig
+  _convert_: 'all'
+
+  trajectory_sampling:
+    _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+    _convert_: 'all'
+    time_horizon: 4
+    interval_length: 0.5
+
+  latent: True
+
+  use_sdroute: True
+  sdroute_num_heads: 8
+  sdroute_dropout: 0.0
+  sdroute_init_seed: 0
+  drop_driving_command: True
+
+checkpoint_path: null
+lr: 6e-4

@@ -1,0 +1,8 @@
+# SafeDrive_Phase2_Planner_FreezePerception_CamOnly that also detects pedestrians (det_pedestrian,
+# see safedrive_config.py). Phase 2 of baseline; phase 3 is safedrive_baseline_agent.
+defaults:
+  - SafeDrive_Phase2_Planner_FreezePerception_CamOnly
+  - _self_
+
+config:
+  det_pedestrian: True

@@ -1,0 +1,21 @@
+# DiffusionDrive, baseline: upstream DiffusionDrive made camera-only (latent: True below);
+# driving command in, no route. Weights: ckpts/diffusiondrive_baseline.ckpt.
+_target_: navsim.agents.diffusiondrive.transfuser_agent.TransfuserAgent
+_convert_: 'all'
+
+config:
+  _target_: navsim.agents.diffusiondrive.transfuser_config.TransfuserConfig
+  _convert_: 'all'
+
+  trajectory_sampling:
+    _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+    _convert_: 'all'
+    time_horizon: 4
+    interval_length: 0.5
+
+  # Camera-only (LiDAR branch replaced by a learned latent), which is how the shipped ckpt was
+  # trained; upstream's default is False. A latent mismatch fails the strict ckpt load.
+  latent: True
+
+checkpoint_path: null
+lr: 6e-4

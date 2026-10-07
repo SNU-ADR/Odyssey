@@ -1,0 +1,200 @@
+_target_: navsim.agents.safedrive.safedrive_agent.SafeDrive_Agent
+_convert_: 'all'
+
+config:
+  _target_: navsim.agents.safedrive.safedrive_config.SafeDrive_Config
+  _convert_: 'all'
+
+  trajectory_sampling:
+    _target_: nuplan.planning.simulation.trajectory.trajectory_sampling.TrajectorySampling
+    _convert_: 'all'
+    time_horizon: 4
+    interval_length: 0.5
+
+  num_bounding_boxes: 49
+  epoch: 60
+
+  agent_vel_weight: 0.1
+
+  # Use BEV Seg multi class
+  bev_seg_multi_class: True
+
+  # Upscaling BEV Seg Resolution
+  lidar_resolution_width: 512
+  lidar_resolution_height: 512
+  bev_pixel_width: 512       # 1024 (512x1024)
+  bev_pixel_height: 512
+  bev_pixel_size: 0.125       # [128x256: 0.25, 256x512: 0.125, 512x1024: 0.0625]
+
+  # LiDAR range
+  lidar_min_x: 0
+  lidar_max_x: 64
+
+  # Predict Future BEV Seg
+  fut_bev_semantic_weight: 7.0
+
+  # get target agent per class
+
+  grid_config: {
+            'x' : [0, 64, 1.0],
+            'y' : [-32, 32, 1.0],
+            'z' : [-5, 3, 8],
+            'depth' : [1.0, 70.0, 0.5],
+            'downsample': 16
+        }
+
+  bevformer_encoder:
+    type: BEVFormerEncoder
+    num_layers: 3
+    pc_range: [0, -32.0, -3.0, 64.0, 32.0, 5.0]
+    num_points_in_pillar: 4
+    return_intermediate: False
+    WH_reverse: True
+    transformerlayers:
+      type: BEVFormerLayer
+      attn_cfgs:
+        - type: TemporalSelfAttention
+          embed_dims: 256
+          num_levels: 1
+        - type: MSDeformableAttention3D
+          embed_dims: 256
+          num_points: 8
+          num_levels: 1
+        - type: SpatialCrossAttention
+          pc_range: [0, -32.0, -3.0, 64.0, 32.0, 5.0]
+          embed_dims: 256
+          deformable_attention:
+            type: MSDeformableAttention3D
+            embed_dims: 256
+            num_points: 8
+            num_levels: 1
+      feedforward_channels: 512
+      ffn_dropout: 0.1
+      operation_order: ['self_attn', 'norm', 'lidar_cross_attn', 'cross_attn', 'norm', 'ffn', 'norm']
+
+  x_range: 64.
+  bev_w: 64
+  pc_range: [0, -32, -5, 64, 32, 3]
+
+  # dn_scalar:  5
+  # dn_bbox_noise_scale: 0.05
+
+  no_planning: False
+
+  proposal_traj_cfg:
+    type: Motion_Decoder
+    num_layers: 2
+    return_intermediate: True
+    transformerlayers:
+      type: Motion_Decoder_Layer
+      embed_dims: 256
+      num_frame: 9
+      attn_cfgs:
+        - type: MultiheadAttention
+          embed_dims: 256
+          num_heads: 8
+          dropout: 0.1
+        - type: Traj_Guided_Deform_Attention
+          embed_dims: 256
+          num_levels: 1
+          num_frame: 9
+          timewise_seperate: True
+      feedforward_channels: 1024
+      ffn_dropout: 0.1
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'ffn', 'norm']
+  prop_traj_n_layers: 2
+
+  SWNet_cfg:
+    type: Motion_Decoder
+    num_layers: 4
+    return_intermediate: True
+    transformerlayers:
+      type: Motion_Decoder_Layer
+      embed_dims: 256
+      num_frame: 9
+      attn_cfgs:
+        - type: MultiheadAttention
+          embed_dims: 256
+          num_heads: 8
+          dropout: 0.1
+        - type: Traj_Guided_Deform_Attention
+          embed_dims: 256
+          num_levels: 1
+          num_frame: 9
+      feedforward_channels: 1024
+      ffn_dropout: 0.1
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm', 'ffn', 'norm']
+  SWNet_num_layers: 4
+
+  scene_level_safety: True
+  # === Simulator-scored target GT ===
+  use_target_scores: True      # score the model's own trajectories with the PDM simulator
+  safety_score_mode: epdms      # epdms => TLC/LK heads supervised; "pdms" drops them
+  # navtrain world cache, 103,288 tokens; must match the feature cache split.
+  safety_metric_cache_path: 'exp/train_metric_cache_navtrain'
+  pred_DDC: True
+  pred_TLC: True
+  pred_LK: True
+  pred_pdm_score: True
+  EP_loss_no_NC_DAC: True
+
+  plan_anchor_path: 'trajectory_anchors/trajectory_anchors_256_GTRS.npy'
+  num_plan_anchor: 256
+
+  AF_topk: True
+  num_filtering_instance: 25
+
+  AF_det_score: True
+
+  det_coord_detach: True
+  agent_filtering_fix: True
+  all_motion_predidction_loss: true
+
+  pwnc_check: True
+  # pair-NC GT comes from the live PDM run (targets['pair_collision_gt']),
+  # needs targets['agent_token_ids'], so the training cache must carry token ids.
+  pair_NC_loss_weight: 100.0
+  pwnc_focal_loss: True
+  pair_NC_class_weighting: True
+  pwnc_focal_alpha: 0.75
+
+  pwdisp_check: True
+  pair_Disp_loss_weight: 0.1
+  pair_Disp_motion_GT_loss: True
+  pair_Disp_motion_with_yaw: True
+
+  twdac_check: True
+  # time-wise DAC GT comes from the live PDM run (targets['twdac_gt']),
+  # per-world, so no agent token ids are needed.
+  twdac_loss_weight: 50.0
+  twdac_focal_loss: True
+  twdac_bev_module: True
+  twdac_reference_detach: True
+  twdac_bev_deform_cfg:
+    type: Motion_Decoder
+    num_layers: 1
+    return_intermediate: True
+    transformerlayers:
+      type: Motion_Decoder_Layer
+      embed_dims: 256
+      num_frame: 9
+      attn_cfgs:
+        - type: MultiheadAttention
+          embed_dims: 256
+          num_heads: 8
+          dropout: 0.1
+        - type: Traj_Guided_Deform_Attention
+          embed_dims: 256
+          num_levels: 1
+          num_frame: 9
+          timewise_seperate: True
+      feedforward_channels: 1024
+      ffn_dropout: 0.1
+      operation_order: ['self_attn', 'norm', 'cross_attn', 'norm',]
+
+  proposalnet_2stage: True
+  num_proposal_2stage: 128
+  stage1_reference_points_detach: True
+
+checkpoint_path: null                               # train_safedrive.sh passes phase 2 last.ckpt; eval_safedrive.sh uses +ckpt_path
+lr: 1e-4
