@@ -1,0 +1,21 @@
+# Agent config for the Odyssey benchmark. See docs/getting_started.md "Port your model".
+# Paths may use ${VAR} and ~; relative paths are taken from this file's directory.
+# DrivoR (four views, resized by the model to 672x1148; needs the DINOv2 backbone under <repo>/weights/).
+# The two overrides replace training-only interpolations (${dataloader...}, ${trainer...}) the agent yaml
+# leaves dangling; they do not change inference.
+model:
+  name: drivor_baseline
+  python: ${ODYSSEY_PLANNER_PY}
+  repo: ${ODYSSEY_ZOO_ROOT}/models/DrivoR
+  agent_config: drivor_baseline_agent
+  checkpoint: ${ODYSSEY_MODELS_ROOT}/models/DrivoR/ckpts/drivor_baseline.ckpt
+  overrides: ["batch_size=1", "scheduler_args.num_epochs=1"]
+history_times_s: [-1.5, -1.0, -0.5, 0.0]
+camera_times_s: {CAM_F0: [0.0], CAM_L0: [0.0], CAM_R0: [0.0], CAM_B0: [0.0]}
+navigation: {driving_command: true, sd_route: none}
+output: {plan_dt: 0.5, shape: [8, 3]}
+feature_shapes:
+  image: [1, 4, 3, 672, 1148]
+  cam_K: [1, 4, 3, 3]
+  world_2_cam: [1, 4, 4, 4]
+  ego_status: [1, 4, 11]

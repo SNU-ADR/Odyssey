@@ -1,0 +1,18 @@
+{
+  "id": "safedrive-odysseyzoo-v2",
+  "base": "OdysseyZoo's SafeDrive before this correction, identified by each file's \"before\" sha256",
+  "files": {
+    "navsim/agents/safedrive/safedrive_model.py": {
+      "before": "19f3ad6574781202990e92d442c7a912c032b2f22c76b7441a3971a049bab64e",
+      "after": "80a60ceac8ca8ac42eed598300ae35a3ce67473bd5a79ccb2a8e01f4c7142434"
+    },
+    "navsim/agents/safedrive/modules/encoder.py": {
+      "before": "ace2d99a99447dc1b0b8561c9d2c10b28b5b9f3ebd52eb61a91d67a1d026b3f3",
+      "after": "88fd62e12327d93162ceb47a7efdefdc112944ef5452d3ccc18d42aef7489ad4"
+    },
+    "navsim/agents/safedrive/inference_compat.py": {
+      "before": null,
+      "after": "c1833b3bab91df5c59966e494f85fdfada847dc875e58a46d4beb17917a29b78"
+    }
+  }
+}

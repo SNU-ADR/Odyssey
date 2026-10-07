@@ -1,0 +1,37 @@
+# Modified from WorldEngine (https://github.com/OpenDriveLab/WorldEngine), licensed under Apache-2.0.
+# Default common configs
+
+defaults:
+  - renderer: omnire
+
+selected_simulation_metrics: null
+
+# Sets verbosity level, in particular determines if progress bars are shown or not.
+verbose: false
+
+# Default experiment configs
+group: 'exp'                                        # Where results, logs, config, etc. are saved
+experiment_name: 'simulation'                       # Experiment name, by default 'simulation' or 'training'
+job_name: 'test'                                    # Job name, as defined in the specific yaml files.
+
+# Directory structure
+date_format: '%Y.%m.%d.%H.%M.%S'
+experiment_uid: ${now:%Y.%m.%d.%H.%M.%S}                     # Unique Id of the experiment, default to timestamp
+experiment: ${experiment_name}/${job_name}          # Unique name of the experiment
+output_dir: ${group}/${experiment}                  # Output directory to save all training artifacts
+metric_dir: metrics                                 # Metric dir name to save metric results.
+aggregator_metric_dir: aggregator_metric            # Aggregator metric dir name to save aggregated metrics.
+runner_report_file: runner_report.json            # Name of the runner report file (one run per output directory)d to avoid overwrite on resume
+log_config: false                                   # Whether to log the final config after all overrides and interpolations
+
+# Execution, engine
+seed: 0                                             # Random seed value.
+enable_profiling: false                             # Whether to enable profiler which will be dumped to "profiling" folder
+gpu: true                                           # Whether to use available GPUs during training/simulation
+
+max_step: 1000000                                   # Maximum number of steps to run the simulation
+decision_repeat: 1                                  # Number of times to repeat the decision making process
+
+# Logger
+log_level: critical                                     # Level of logger
+logger_format_string: null                          # Logger format string, set null to use the default format string

@@ -1,0 +1,18 @@
+# Agent config for the Odyssey benchmark. See docs/getting_started.md "Port your model".
+# Paths may use ${VAR} and ~; relative paths are taken from this file's directory.
+# ReCogDrive (InternVL2-2B VLM + diffusion planner; one front view). Not generic: its adapter
+# resolves the Stage-1 VLM (<repo>/ckpts/ReCogDrive-VLM-2B, or RECOGDRIVE_VLM_PATH; 3.9 GB, in the
+# ADRLAB/odyssey-models release) and feeds the VLM prompt. Its code needs Python >= 3.10 and
+# transformers 4.37.2, so it runs in its own interpreter, RECOGDRIVE_PLANNER_PY (docs/installation.md, "ReCogDrive").
+model:
+  name: recogdrive_baseline
+  python: ${RECOGDRIVE_PLANNER_PY}
+  repo: ${ODYSSEY_ZOO_ROOT}/models/recogdrive
+  agent_config: recogdrive_baseline_agent
+  checkpoint: ${ODYSSEY_MODELS_ROOT}/models/recogdrive/ckpts/recogdrive_baseline.ckpt
+  overrides: []
+  adapter: odyssey_bridge.planners.recogdrive:ReCogDrivePlanner
+history_times_s: [-1.5, -1.0, -0.5, 0.0]
+camera_times_s: {CAM_F0: [0.0]}
+navigation: {driving_command: true, sd_route: none}
+output: {plan_dt: 0.5, shape: [8, 3]}

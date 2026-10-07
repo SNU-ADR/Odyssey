@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 390" width="1000" height="390" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3b4252"/>
+    </marker>
+  </defs>
+
+  <!-- opaque canvas so the figure reads the same on light and dark GitHub themes -->
+  <rect x="0" y="0" width="1000" height="390" rx="14" fill="#ffffff"/>
+
+  <!-- OdysseyBenchmark frame -->
+  <rect x="16" y="16" width="968" height="358" rx="14" fill="#fff8e6" stroke="#c99a1e" stroke-width="2"/>
+  <text x="38" y="52" font-size="21" font-weight="700" fill="#5c4300">OdysseyBenchmark</text>
+
+  <!-- input -->
+  <rect x="38" y="96" width="170" height="70" rx="10" fill="#ffffff" stroke="#8a8f99" stroke-width="1.5"/>
+  <text x="123" y="126" font-size="17" font-weight="700" fill="#1f2328" text-anchor="middle">Odyssey scenes</text>
+  <text x="123" y="150" font-size="14.5" fill="#3b4252" text-anchor="middle">100 reconstructed logs</text>
+
+  <!-- components -->
+  <rect x="290" y="96" width="230" height="70" rx="12" fill="#e8f1ff" stroke="#2f6fd6" stroke-width="2"/>
+  <text x="405" y="138" font-size="19" font-weight="700" fill="#123f8c" text-anchor="middle">OdysseyRenderer</text>
+
+  <rect x="730" y="96" width="230" height="70" rx="12" fill="#eaf7ee" stroke="#2e8b57" stroke-width="2"/>
+  <text x="845" y="138" font-size="19" font-weight="700" fill="#1d5c39" text-anchor="middle">OdysseyZoo</text>
+
+  <rect x="290" y="250" width="670" height="70" rx="12" fill="#f3ecfb" stroke="#7b4bc4" stroke-width="2"/>
+  <text x="625" y="292" font-size="19" font-weight="700" fill="#4b2386" text-anchor="middle">OdysseyTrafficAgent</text>
+
+  <!-- output -->
+  <rect x="38" y="250" width="170" height="70" rx="10" fill="#ffffff" stroke="#c99a1e" stroke-width="1.5"/>
+  <text x="123" y="280" font-size="17" font-weight="700" fill="#1f2328" text-anchor="middle">Driving score</text>
+  <text x="123" y="304" font-size="14.5" fill="#3b4252" text-anchor="middle">RouteDS per scene</text>
+
+  <!-- flow -->
+  <line x1="208" y1="131" x2="286" y2="131" stroke="#3b4252" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <line x1="520" y1="131" x2="726" y2="131" stroke="#3b4252" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <text x="623" y="120" font-size="17" fill="#1f2328" text-anchor="middle">camera images</text>
+  <line x1="845" y1="166" x2="845" y2="246" stroke="#3b4252" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <text x="835" y="212" font-size="17" fill="#1f2328" text-anchor="end">planned trajectory</text>
+  <line x1="405" y1="250" x2="405" y2="170" stroke="#3b4252" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <text x="417" y="212" font-size="17" fill="#1f2328">ego, agent and signal states</text>
+  <line x1="290" y1="285" x2="212" y2="285" stroke="#3b4252" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <text x="249" y="274" font-size="15" fill="#1f2328" text-anchor="middle">rollout</text>
+
+  <text x="500" y="352" font-size="15" fill="#5c4300" text-anchor="middle">closed loop at 0.1 s until the route is completed, the ego leaves the route, or time runs out</text>
+</svg>

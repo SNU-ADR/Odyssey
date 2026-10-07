@@ -1,0 +1,255 @@
+{
+ "schema": "tl_signal_patch/1",
+ "scene": "odyssey_scene032",
+ "signals": [
+  {
+   "roadblock": "50420",
+   "connectors": [
+    "47570"
+   ],
+   "patches": [
+    [
+     291,
+     351,
+     "R",
+     "camera",
+     {
+      "db": "G",
+      "heads": [
+       "tl_bulb_35949",
+       "tl_bulb_36070"
+      ],
+      "cameras": [
+       "CAM_F0"
+      ],
+      "depth_m": [
+       35.2,
+       39.8
+      ],
+      "box_px": [
+       58,
+       68
+      ],
+      "merged_rows": 0
+     }
+    ],
+    [
+     425,
+     451,
+     "G",
+     "camera",
+     {
+      "db": "RU",
+      "heads": [
+       "tl_bulb_35949",
+       "tl_bulb_36070"
+      ],
+      "cameras": [
+       "CAM_F0"
+      ],
+      "depth_m": [
+       33.1,
+       35.1
+      ],
+      "box_px": [
+       66,
+       73
+      ],
+      "merged_rows": 0
+     }
+    ],
+    [
+     508,
+     555,
+     "G",
+     "hold_after_observed",
+     {
+      "db": "RU",
+      "rule": "hold the last observed colour after the last camera-accepted row (501) -- user decision 2026-09-24"
+     }
+    ],
+    [
+     610,
+     999,
+     "G",
+     "hold_after_observed",
+     {
+      "db": "U",
+      "rule": "hold the last observed colour after the last camera-accepted row (501) -- user decision 2026-09-24"
+     }
+    ]
+   ],
+   "hold_after_observed": {
+    "first_observed_row": 150,
+    "last_observed_row": 501,
+    "sequence": [
+     [
+      "R",
+      150,
+      424
+     ],
+     [
+      "G",
+      425,
+      501
+     ]
+    ],
+    "transitions": [
+     {
+      "frm": "R",
+      "to": "G",
+      "last_row": 424,
+      "first_row": 425
+     }
+    ],
+    "before_first_observed": {
+     "rows": 150,
+     "db": {
+      "U": 124,
+      "R": 26
+     }
+    },
+    "status": "held",
+    "colour": "G",
+    "held_from": 502,
+    "held_to": 999,
+    "rows_patched": 438,
+    "db_replaced": {
+     "U": 431,
+     "R": 7
+    },
+    "ok_user_rows_overridden": 0,
+    "rows_already_colour": 60
+   }
+  },
+  {
+   "roadblock": "50826",
+   "connectors": [
+    "48589",
+    "48590"
+   ],
+   "patches": [
+    [
+     104,
+     126,
+     "G",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50420"
+      ],
+      "intersection": "45309",
+      "approach": "49600"
+     }
+    ],
+    [
+     147,
+     404,
+     "G",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50420"
+      ],
+      "intersection": "45309",
+      "approach": "49600"
+     }
+    ],
+    [
+     405,
+     424,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50420"
+      ],
+      "intersection": "45309",
+      "approach": "49600",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     425,
+     999,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50420"
+      ],
+      "intersection": "45309",
+      "approach": "49600"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45309",
+   "approach": "49600",
+   "ego_signals": [
+    "50420"
+   ]
+  },
+  {
+   "roadblock": "50964",
+   "connectors": [
+    "52732",
+    "52879"
+   ],
+   "patches": [
+    [
+     104,
+     126,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50420"
+      ],
+      "intersection": "45309",
+      "approach": "49067"
+     }
+    ],
+    [
+     147,
+     424,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50420"
+      ],
+      "intersection": "45309",
+      "approach": "49067"
+     }
+    ],
+    [
+     425,
+     999,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50420"
+      ],
+      "intersection": "45309",
+      "approach": "49067"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45309",
+   "approach": "49067",
+   "ego_signals": [
+    "50420"
+   ]
+  }
+ ]
+}

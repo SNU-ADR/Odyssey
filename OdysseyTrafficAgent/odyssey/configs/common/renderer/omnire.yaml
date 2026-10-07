@@ -1,0 +1,18 @@
+# Calibrated Gaussian renderer and checkpoint actor contract.
+_target_: odyssey_renderer.omnire.engine.OmniReRenderEngine
+_convert_: all
+enable_collider: false
+render_depth: false
+rasterize_mode: classic
+radius_clip: 0.0
+background_color: black
+device: cuda
+actor_pose_source: checkpoint
+horizon_extension_factor: 2.0
+lift: tick
+road_surface: null
+# Rasterisation resolution scale. 1.0 is the standard 1080p behaviour.
+# 0.5333333333333333 renders 1920x1080 -> 1024x576, the native resolution the Fixer was trained at.
+# Note: keep 1.0 for rollouts that drive a planner. Planner camera preprocessing assumes
+# 1920x1080 pixel for pixel (see the render_scale comment in engine.py).
+render_scale: 1.0

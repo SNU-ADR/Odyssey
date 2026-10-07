@@ -1,0 +1,508 @@
+{
+ "schema": "tl_signal_patch_designated/1",
+ "signals": [
+  {
+   "scene": "odyssey_scene011",
+   "roadblock": "50988",
+   "connectors": [
+    "49662"
+   ],
+   "render_heads": [
+    "tl_bulb_38933",
+    "tl_bulb_39209"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_38933": "skipped_baked",
+     "tl_bulb_39209": "yes"
+    },
+    "R": {
+     "tl_bulb_38933": "skipped_baked",
+     "tl_bulb_39209": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_39209"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_39209"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene025",
+   "roadblock": "51611",
+   "connectors": [
+    "48995",
+    "48996"
+   ],
+   "render_heads": [
+    "tl_bulb_38981"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_38981": "yes"
+    },
+    "R": {
+     "tl_bulb_38981": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_38981"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_38981"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene032",
+   "roadblock": "50420",
+   "connectors": [
+    "47570"
+   ],
+   "render_heads": [
+    "tl_bulb_35949",
+    "tl_bulb_36070"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_35949": "yes",
+     "tl_bulb_36070": "yes"
+    },
+    "R": {
+     "tl_bulb_35949": "yes",
+     "tl_bulb_36070": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_35949",
+      "tl_bulb_36070"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_35949",
+      "tl_bulb_36070"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene052",
+   "roadblock": "50883",
+   "connectors": [
+    "52974"
+   ],
+   "render_heads": [
+    "tl_bulb_36173",
+    "tl_bulb_36869"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_36173": "rep_shows_other_colour",
+     "tl_bulb_36869": "yes"
+    },
+    "R": {
+     "tl_bulb_36173": "yes",
+     "tl_bulb_36869": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_36173",
+      "tl_bulb_36869"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_36869"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene056",
+   "roadblock": "49879",
+   "connectors": [
+    "47633",
+    "47634"
+   ],
+   "render_heads": [
+    "tl_bulb_36056",
+    "tl_bulb_36193"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_36056": "yes",
+     "tl_bulb_36193": "yes"
+    },
+    "R": {
+     "tl_bulb_36056": "yes",
+     "tl_bulb_36193": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_36056",
+      "tl_bulb_36193"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_36056",
+      "tl_bulb_36193"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene060",
+   "roadblock": "50634",
+   "connectors": [
+    "52588",
+    "53009",
+    "53137"
+   ],
+   "render_heads": [
+    "tl_bulb_36043",
+    "tl_bulb_36834"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_36043": "yes",
+     "tl_bulb_36834": "yes"
+    },
+    "R": {
+     "tl_bulb_36043": "yes",
+     "tl_bulb_36834": "render_check_fail"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_36043"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_36043",
+      "tl_bulb_36834"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene061",
+   "roadblock": "49774",
+   "connectors": [
+    "48107",
+    "48108"
+   ],
+   "render_heads": [
+    "tl_bulb_36376",
+    "tl_bulb_36586"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_36376": "yes",
+     "tl_bulb_36586": "yes"
+    },
+    "R": {
+     "tl_bulb_36376": "yes",
+     "tl_bulb_36586": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_36376",
+      "tl_bulb_36586"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_36376",
+      "tl_bulb_36586"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene067",
+   "roadblock": "50108",
+   "connectors": [
+    "53219"
+   ],
+   "render_heads": [
+    "tl_bulb_35860",
+    "tl_bulb_36702"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_35860": "yes",
+     "tl_bulb_36702": "yes"
+    },
+    "R": {
+     "tl_bulb_35860": "yes",
+     "tl_bulb_36702": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_35860",
+      "tl_bulb_36702"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_35860",
+      "tl_bulb_36702"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene072",
+   "roadblock": "19700",
+   "connectors": [
+    "20369"
+   ],
+   "render_heads": [
+    "tl_bulb_14571",
+    "tl_bulb_14575"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_14571": "yes",
+     "tl_bulb_14575": "yes"
+    },
+    "R": {
+     "tl_bulb_14571": "yes",
+     "tl_bulb_14575": "yes"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_14571",
+      "tl_bulb_14575"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "fully",
+     "heads": [
+      "tl_bulb_14571",
+      "tl_bulb_14575"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene075",
+   "roadblock": "60026",
+   "connectors": [
+    "69018",
+    "69089",
+    "69952"
+   ],
+   "render_heads": [
+    "tl_bulb_47088",
+    "tl_bulb_47101",
+    "tl_bulb_47105",
+    "tl_bulb_47109",
+    "tl_bulb_48695"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_47088": "yes",
+     "tl_bulb_47101": "skipped_transparent",
+     "tl_bulb_47105": "skipped_transparent",
+     "tl_bulb_47109": "no_rep",
+     "tl_bulb_48695": "no_rep"
+    },
+    "R": {
+     "tl_bulb_47088": "yes",
+     "tl_bulb_47101": "skipped_transparent",
+     "tl_bulb_47105": "skipped_transparent",
+     "tl_bulb_47109": "no_rep",
+     "tl_bulb_48695": "no_rep"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_47088"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_47088"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene086",
+   "roadblock": "60121",
+   "connectors": [
+    "69447",
+    "69629",
+    "70105",
+    "70431"
+   ],
+   "render_heads": [
+    "tl_bulb_46947",
+    "tl_bulb_46951",
+    "tl_bulb_46959",
+    "tl_bulb_46964",
+    "tl_bulb_46968",
+    "tl_bulb_46972",
+    "tl_bulb_47015"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_46947": "rep_dark",
+     "tl_bulb_46951": "rep_dark",
+     "tl_bulb_46959": "rep_dark",
+     "tl_bulb_46964": "rep_dark",
+     "tl_bulb_46968": "rep_dark",
+     "tl_bulb_46972": "rep_dark",
+     "tl_bulb_47015": "rep_dark"
+    },
+    "R": {
+     "tl_bulb_46947": "rep_dark",
+     "tl_bulb_46951": "rep_dark",
+     "tl_bulb_46959": "rep_dark",
+     "tl_bulb_46964": "rep_dark",
+     "tl_bulb_46968": "rep_dark",
+     "tl_bulb_46972": "rep_dark",
+     "tl_bulb_47015": "rep_dark"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": false,
+     "cls": "not",
+     "heads": []
+    },
+    "G": {
+     "showable": false,
+     "cls": "not",
+     "heads": []
+    }
+   },
+   "other_movement_heads": []
+  },
+  {
+   "scene": "odyssey_scene086",
+   "roadblock": "60109",
+   "connectors": [
+    "68636",
+    "69070",
+    "69419",
+    "70096",
+    "70507"
+   ],
+   "render_heads": [
+    "tl_bulb_48920",
+    "tl_bulb_48924",
+    "tl_bulb_48928"
+   ],
+   "render_head_state": {
+    "G": {
+     "tl_bulb_48920": "render_check_fail",
+     "tl_bulb_48924": "yes",
+     "tl_bulb_48928": "render_check_fail"
+    },
+    "R": {
+     "tl_bulb_48920": "yes",
+     "tl_bulb_48924": "yes",
+     "tl_bulb_48928": "render_check_fail"
+    }
+   },
+   "showable": {
+    "R": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_48920",
+      "tl_bulb_48924"
+     ]
+    },
+    "G": {
+     "showable": true,
+     "cls": "partially",
+     "heads": [
+      "tl_bulb_48924"
+     ]
+    }
+   },
+   "other_movement_heads": []
+  }
+ ]
+}

@@ -1,0 +1,135 @@
+{
+ "schema": "tl_signal_patch/1",
+ "scene": "odyssey_scene060",
+ "signals": [
+  {
+   "roadblock": "50634",
+   "connectors": [
+    "52588",
+    "53009",
+    "53137"
+   ],
+   "patches": [
+    [
+     0,
+     93,
+     "R",
+     "user+camera",
+     {
+      "db": "U",
+      "heads": [
+       "tl_bulb_36043",
+       "tl_bulb_36834"
+      ],
+      "cameras": [
+       "CAM_F0"
+      ],
+      "depth_m": [
+       26.8,
+       26.8
+      ],
+      "box_px": [
+       72,
+       85
+      ],
+      "merged_rows": 0
+     }
+    ],
+    [
+     94,
+     134,
+     "G",
+     "user+camera",
+     {
+      "db": "U",
+      "heads": [
+       "tl_bulb_36043",
+       "tl_bulb_36834"
+      ],
+      "cameras": [
+       "CAM_F0"
+      ],
+      "depth_m": [
+       24.6,
+       26.8
+      ],
+      "box_px": [
+       72,
+       92
+      ],
+      "merged_rows": 0
+     }
+    ],
+    [
+     176,
+     185,
+     "G",
+     "hold_after_observed",
+     {
+      "db": "U",
+      "rule": "hold the last observed colour after the last camera-accepted row (171) -- user decision 2026-09-24"
+     }
+    ],
+    [
+     245,
+     257,
+     "G",
+     "hold_after_observed",
+     {
+      "db": "RU",
+      "rule": "hold the last observed colour after the last camera-accepted row (171) -- user decision 2026-09-24"
+     }
+    ],
+    [
+     291,
+     999,
+     "G",
+     "hold_after_observed",
+     {
+      "db": "U",
+      "rule": "hold the last observed colour after the last camera-accepted row (171) -- user decision 2026-09-24"
+     }
+    ]
+   ],
+   "hold_after_observed": {
+    "first_observed_row": 0,
+    "last_observed_row": 171,
+    "sequence": [
+     [
+      "R",
+      0,
+      93
+     ],
+     [
+      "G",
+      94,
+      171
+     ]
+    ],
+    "transitions": [
+     {
+      "frm": "R",
+      "to": "G",
+      "last_row": 93,
+      "first_row": 94
+     }
+    ],
+    "before_first_observed": {
+     "rows": 0,
+     "db": {}
+    },
+    "status": "held",
+    "colour": "G",
+    "held_from": 172,
+    "held_to": 999,
+    "rows_patched": 732,
+    "db_replaced": {
+     "U": 720,
+     "R": 12
+    },
+    "ok_user_rows_overridden": 0,
+    "rows_already_colour": 96
+   }
+  }
+ ]
+}

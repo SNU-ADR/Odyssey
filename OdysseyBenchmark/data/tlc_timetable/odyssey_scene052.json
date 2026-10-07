@@ -1,0 +1,852 @@
+{
+ "schema": "tl_signal_patch/1",
+ "scene": "odyssey_scene052",
+ "signals": [
+  {
+   "roadblock": "50883",
+   "connectors": [
+    "52974"
+   ],
+   "patches": [
+    [
+     420,
+     458,
+     "R",
+     "camera",
+     {
+      "db": "U",
+      "heads": [
+       "tl_bulb_36173",
+       "tl_bulb_36869"
+      ],
+      "cameras": [
+       "CAM_F0"
+      ],
+      "depth_m": [
+       47.9,
+       79.5
+      ],
+      "box_px": [
+       29,
+       58
+      ],
+      "merged_rows": 0
+     }
+    ],
+    [
+     767,
+     775,
+     "G",
+     "camera",
+     {
+      "db": "RU",
+      "heads": [
+       "tl_bulb_36869"
+      ],
+      "cameras": [
+       "CAM_F0"
+      ],
+      "depth_m": [
+       28.9,
+       29.7
+      ],
+      "box_px": [
+       80,
+       82
+      ],
+      "merged_rows": 0
+     }
+    ],
+    [
+     781,
+     783,
+     "G",
+     "camera",
+     {
+      "db": "R",
+      "heads": [
+       "tl_bulb_36869"
+      ],
+      "cameras": [
+       "CAM_F0"
+      ],
+      "depth_m": [
+       27.2,
+       27.7
+      ],
+      "box_px": [
+       86,
+       87
+      ],
+      "merged_rows": 1
+     }
+    ],
+    [
+     858,
+     999,
+     "G",
+     "hold_after_observed",
+     {
+      "db": "U",
+      "rule": "hold the last observed colour after the last camera-accepted row (836) -- user decision 2026-09-24"
+     }
+    ]
+   ],
+   "hold_after_observed": {
+    "first_observed_row": 420,
+    "last_observed_row": 836,
+    "sequence": [
+     [
+      "R",
+      420,
+      750
+     ],
+     [
+      "G",
+      767,
+      836
+     ]
+    ],
+    "transitions": [
+     {
+      "frm": "R",
+      "to": "G",
+      "last_row": 750,
+      "first_row": 767
+     }
+    ],
+    "before_first_observed": {
+     "rows": 420,
+     "db": {
+      "U": 420
+     }
+    },
+    "status": "held",
+    "colour": "G",
+    "held_from": 837,
+    "held_to": 999,
+    "rows_patched": 142,
+    "db_replaced": {
+     "U": 142
+    },
+    "ok_user_rows_overridden": 0,
+    "rows_already_colour": 21
+   }
+  },
+  {
+   "roadblock": "49767",
+   "connectors": [
+    "52660"
+   ],
+   "patches": [
+    [
+     420,
+     439,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     440,
+     459,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     460,
+     746,
+     "G",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     747,
+     766,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     767,
+     775,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     776,
+     780,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     781,
+     999,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "49029",
+   "ego_signals": [
+    "50883"
+   ]
+  },
+  {
+   "roadblock": "50416",
+   "connectors": [
+    "48083"
+   ],
+   "patches": [
+    [
+     420,
+     439,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     440,
+     766,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     767,
+     775,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     776,
+     780,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     781,
+     999,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45263",
+   "approach": "48853",
+   "ego_signals": [
+    "50883"
+   ]
+  },
+  {
+   "roadblock": "50557",
+   "connectors": [
+    "47523",
+    "47524"
+   ],
+   "patches": [
+    [
+     420,
+     439,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     440,
+     766,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     767,
+     775,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     776,
+     780,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     781,
+     999,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45263",
+   "approach": "48853",
+   "ego_signals": [
+    "50883"
+   ]
+  },
+  {
+   "roadblock": "50667",
+   "connectors": [
+    "47886"
+   ],
+   "patches": [
+    [
+     420,
+     439,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     440,
+     766,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     767,
+     775,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     776,
+     780,
+     "R",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ],
+    [
+     781,
+     999,
+     "G",
+     "oncoming_of_ego",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "48853"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45263",
+   "approach": "48853",
+   "ego_signals": [
+    "50883"
+   ]
+  },
+  {
+   "roadblock": "50668",
+   "connectors": [
+    "47869",
+    "47870"
+   ],
+   "patches": [
+    [
+     420,
+     439,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     440,
+     459,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     460,
+     746,
+     "G",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     747,
+     766,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     767,
+     775,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     776,
+     780,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     781,
+     999,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "49029",
+   "ego_signals": [
+    "50883"
+   ]
+  },
+  {
+   "roadblock": "50977",
+   "connectors": [
+    "52736"
+   ],
+   "patches": [
+    [
+     420,
+     439,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     440,
+     459,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     460,
+     746,
+     "G",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     747,
+     766,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     767,
+     775,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ],
+    [
+     776,
+     780,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     781,
+     999,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "49029",
+   "ego_signals": [
+    "50883"
+   ]
+  },
+  {
+   "roadblock": "51016",
+   "connectors": [
+    "47110",
+    "47111"
+   ],
+   "patches": [
+    [
+     420,
+     439,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49193"
+     }
+    ],
+    [
+     440,
+     459,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49193",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     460,
+     746,
+     "G",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49193"
+     }
+    ],
+    [
+     747,
+     766,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49193",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     767,
+     775,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49193"
+     }
+    ],
+    [
+     776,
+     780,
+     "R",
+     "cross_all_red",
+     {
+      "rule": "all-red clearance (user decision 2026-09-25): ego R->G at t -> cross R from t-N; ego G->R at t -> cross G only from t+N; i.e. cross G only on ego-R rows with no ego-G row within N rows; ego spans unchanged",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49193",
+      "clearance_rows": 20
+     }
+    ],
+    [
+     781,
+     999,
+     "R",
+     "cross_of_ego",
+     {
+      "rule": "ego G -> cross R, ego R -> cross G; ego unknown -> DB (user decision 2026-09-25)",
+      "ego_signals": [
+       "50883"
+      ],
+      "intersection": "45263",
+      "approach": "49193"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "49193",
+   "ego_signals": [
+    "50883"
+   ]
+  }
+ ]
+}

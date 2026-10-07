@@ -1,0 +1,29 @@
+# Agent config for the Odyssey benchmark. See docs/getting_started.md "Port your model".
+# Paths may use ${VAR} and ~; relative paths are taken from this file's directory.
+# SafeDrive (three views at three past times; needs the SafeDrive native fix, see docs/installation.md).
+# Plans are ranked by the retuned test-time scoring (adapter), as in the paper.
+model:
+  name: safedrive_sdroute
+  python: ${ODYSSEY_PLANNER_PY}
+  repo: ${ODYSSEY_ZOO_ROOT}/models/SafeDrive
+  agent_config: safedrive_sdroute_agent
+  checkpoint: ${ODYSSEY_MODELS_ROOT}/models/SafeDrive/ckpts/safedrive_sdroute.ckpt
+  adapter: odyssey_bridge.planners.safedrive:SafeDriveSDRouteTunedPlanner
+  overrides: []
+  # On a host without the Hugging Face cache (timm/resnet34.a1_in1k), point the backbone
+  # initialisation at the downloaded file; the trained checkpoint overwrites these weights:
+  #   overrides: ["++config.bkb_path=/path/to/resnet34.a1_in1k/model.safetensors"]
+history_times_s: [-1.5, -1.0, -0.5, 0.0]
+camera_times_s:
+  CAM_F0: [-1.0, -0.5, 0.0]
+  CAM_L0: [-1.0, -0.5, 0.0]
+  CAM_R0: [-1.0, -0.5, 0.0]
+navigation: {driving_command: false, sd_route: features}
+output: {plan_dt: 0.5, shape: [8, 3]}
+feature_shapes:
+  camera_feature: [1, 3, 3, 3, 256, 512]
+  lidar2img: [1, 3, 3, 4, 4]
+  status_feature: [1, 3, 8]
+  ego_poses: [1, 3, 3]
+  route_centerline: [1, 120, 5]
+  route_centerline_mask: [1, 120]

@@ -1,0 +1,27 @@
+# Python caches, build output, editor and test state
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage*
+.vscode/
+.idea/
+
+# Simulation outputs and local measurements (README: "Simulation outputs go under experiments/")
+/experiments/
+/artifacts/
+/outputs/
+/temp/
+
+# Installed beside the code, never committed (docs/installation.md)
+/third_party/
+# Weights linked or downloaded into the bundled OdysseyZoo (its own .gitignore matches directories only)
+/OdysseyZoo/models/*/ckpts
+/OdysseyZoo/models/*/weights
+/OdysseyZoo/models/*/pretrained
+/OdysseyRenderer/fixer/models
+/OdysseyRenderer/fixer/logs/
+/OdysseyRenderer/fixer/flash_attn_stub/build/

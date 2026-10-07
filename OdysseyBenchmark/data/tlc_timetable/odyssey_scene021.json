@@ -1,0 +1,53 @@
+{
+ "schema": "tl_signal_patch/1",
+ "scene": "odyssey_scene021",
+ "signals": [
+  {
+   "roadblock": "50765",
+   "connectors": [
+    "52885",
+    "53227"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "46923",
+      "approach": "50406",
+      "ego_approach": "50406"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "46923",
+   "approach": "50406"
+  },
+  {
+   "roadblock": "50988",
+   "connectors": [
+    "49662"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "46923",
+      "approach": "50406",
+      "ego_approach": "50406"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "46923",
+   "approach": "50406"
+  }
+ ]
+}

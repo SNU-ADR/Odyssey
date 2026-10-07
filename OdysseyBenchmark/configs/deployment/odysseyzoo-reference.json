@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "description": "Reference deployment: the bundled OdysseyZoo (SafeDrive patch applied) with the published (ADRLAB/odyssey-models) weights. Weights, maps and caches are external.",
+  "native_patch": "safedrive-odysseyzoo-v2",
+  "environment_image": "sha256:bdc6d36978716f4e37ca360dd5607c9aa88168632cec0445fd33841424e7753e",
+  "runtime_root": "$ODYSSEY_RUNTIME_ROOT",
+  "interpreters": {
+    "simulation": "$ODYSSEY_SIM_PY",
+    "planner": "$ODYSSEY_PLANNER_PY",
+    "fixer": "$ODYSSEY_RUNTIME_ROOT/fixer/bin/python"
+  },
+  "files": [
+    {
+      "base": "scenes",
+      "path": "odyssey_scene001/scenario.pkl",
+      "bytes": 155212130,
+      "sha256": "5fc0421d65e45f57b428c5f10c150fd880035c24c7cc224f368427a55db87716"
+    },
+    {
+      "base": "scenes",
+      "path": "odyssey_scene001/scene.ckpt",
+      "bytes": 4132993482,
+      "sha256": "e438dc336a5e7714c1acf6fb0f32006d29b90056d0c0d94662dc609884bccf06"
+    },
+    {
+      "base": "scenes",
+      "path": "odyssey_scene001/checkpoint_inventory.json",
+      "bytes": 14624,
+      "sha256": "32039a5b0122a1cbeed6b3f1a39bde1addfe7f66af0d3a5c6995160ee819d4f9"
+    },
+    {
+      "base": "scenes",
+      "path": "odyssey_scene001/road_surface.npz",
+      "bytes": 1193830,
+      "sha256": "a8213223cd14aa1dfdd3be74ee89a3dfa83c026ec41c2183a7e031139a7f702c"
+    },
+    {
+      "base": "scenes",
+      "path": "odyssey_scene001/route.npz",
+      "bytes": 57435,
+      "sha256": "a53fc4d64162938623aeb13d0ff7a491002db5214c37a86004e88bc5f64ab6a4"
+    },
+    {
+      "base": "scenes",
+      "path": "odyssey_scene001/tl_control.json",
+      "bytes": 18997,
+      "sha256": "f07cb7c33e0085774c4f04ba343f31b21ddd530eafd102eb83133788b9dd8df1"
+    },
+    {
+      "path": "OdysseyRenderer/fixer/models/finetuned/h1_b16_e1_model_11001.pkl",
+      "bytes": 4054208250,
+      "sha256": "fb465c74161287b376456323f50ba0e9d83274ef40042a8480395f6f7c3606f4"
+    },
+    {
+      "path": "OdysseyRenderer/fixer/models/base/model_fast_tokenizer.pt",
+      "bytes": 1195209447,
+      "sha256": "a0b2d0c993e88b818bf8e389dce14d58ac901be7092a72b4adf79ca065bd6742"
+    },
+    {
+      "path": "OdysseyRenderer/fixer/models/base/tokenizer_fast.pth",
+      "bytes": 230994532,
+      "sha256": "6a667c56e9f04022a90966e8715935a83e2cd1ecf8a433db6b1e3ce56ae40282"
+    },
+    {
+      "base": "models",
+      "path": "models/navsim/ckpts/ltf_sdroute.ckpt",
+      "bytes": 237148771,
+      "sha256": "c57a92a5f645c111f19c9e4616d06920766432acaed9e4a760f28c8dea56c432"
+    },
+    {
+      "base": "models",
+      "path": "models/DiffusionDrive/ckpts/diffusiondrive_sdroute.ckpt",
+      "bytes": 252432907,
+      "sha256": "64684ca8ce1ea1a5bd152d86a5f4f7530069007676db2c3d5f409c79c17da68b"
+    },
+    {
+      "base": "models",
+      "path": "models/SafeDrive/ckpts/safedrive_sdroute.ckpt",
+      "bytes": 478786573,
+      "sha256": "bbe47afa6ccb28ef6663f628ed784f12c19f36bbe03ece36bca1d9ba46d2aed1"
+    },
+    {
+      "base": "models",
+      "path": "models/DrivoR/ckpts/drivor_sdroute.ckpt",
+      "bytes": 179658018,
+      "sha256": "22ff0261fc06f114e57d4ed8d1f91c9fc467e57789e02d961afe39112d5a2dd2"
+    },
+    {
+      "path": "OdysseyZoo/models/DrivoR/weights/vit_small_patch14_reg4_dinov2.lvd142m/model.safetensors",
+      "bytes": 88245200,
+      "sha256": "dca70548ecd7b03ffba6172c4db403014511b5ee6073f9fca72ba9e6e602a25d"
+    },
+    {
+      "path": "OdysseyZoo/models/SafeDrive/.odyssey-safedrive-patch.json",
+      "bytes": 773,
+      "sha256": "1e0e2409a4a9f744e4e292a72cec0341b0ec81fc55fa9bbc6fd540231e3c1490"
+    },
+    {
+      "base": "maps",
+      "path": "us-pa-pittsburgh-hazelwood/9.17.1937/map.gpkg",
+      "bytes": 186761216,
+      "sha256": "d04464f98175934cb2445f86959356583841a22c3d5b219314e561e0072e816a"
+    },
+    {
+      "base": "maps",
+      "path": "sg-one-north/9.17.1964/map.gpkg",
+      "bytes": 317575168,
+      "sha256": "4062b83dda3e616897a0378fa61b91122ae6f0343187e871adb92f74426dc9a3"
+    },
+    {
+      "base": "maps",
+      "path": "us-nv-las-vegas-strip/9.15.1915/map.gpkg",
+      "bytes": 523767808,
+      "sha256": "f1509eeed9c1c96e1cddf1c5f6d71f7ab9eed8f895de59ab36132308708e8937"
+    },
+    {
+      "base": "maps",
+      "path": "us-ma-boston/9.12.1817/map.gpkg",
+      "bytes": 254087168,
+      "sha256": "62abd55f127dd7bb06c86e5eaed09afc9be2546e581a13bd7b4e24c4b2f5f414"
+    },
+    {
+      "base": "maps",
+      "path": "nuplan-maps-v1.0.json",
+      "bytes": 50662,
+      "sha256": "b9c0a62335dded8b25e634bc63e3f271908b6f4f803398f0250ef7769facc504"
+    },
+    {
+      "base": "hf_cache",
+      "path": "models--timm--resnet34.a1_in1k/snapshots/0e8757122c4c09b15fb9300c0fd09b3fe89e28bf/model.safetensors",
+      "bytes": 87278522,
+      "sha256": "829a220f9529d2b1ffdc8719d3273463001e0daf411eaf1916865d9db62c0ed2"
+    }
+  ],
+  "source_trees": [
+    {
+      "path": "OdysseyZoo/models/navsim",
+      "sha256": "63143b82d139f397c427906701839ccaa2f0135c520bdee84d6fab4bb6aaa26b"
+    },
+    {
+      "path": "OdysseyZoo/models/DiffusionDrive",
+      "sha256": "f6453c041d575577115d3d4265aef1d129a8353284b32277d88bd356dfdd19bc"
+    },
+    {
+      "path": "OdysseyZoo/models/SafeDrive",
+      "sha256": "0487aeaf9bc7f9e41c283f91c6d54dfd2f003ea328389d722fdb3cfe99baed52"
+    },
+    {
+      "path": "OdysseyZoo/models/DrivoR",
+      "sha256": "ac78fecde3c5534caa8e99c142757696129cba60f6a072568a74e9929b2d3ce2"
+    },
+    {
+      "path": "OdysseyZoo/sdroute",
+      "sha256": "dc177f1bc49b7b00a4ba12c5f127758742824093cef8b35bfe2f023e124e1f09"
+    },
+    {
+      "path": "third_party/nvdiffrast",
+      "sha256": "df23537a0b9aebbfa2fe9da5c0a4f2f1240e1da506dae9d77cfe6bd7b1554816",
+      "optional": true
+    }
+  ],
+  "drivor_selection": "The published ADRLAB/odyssey-models drivor_sdroute.ckpt (sha256 22ff0261...)."
+}

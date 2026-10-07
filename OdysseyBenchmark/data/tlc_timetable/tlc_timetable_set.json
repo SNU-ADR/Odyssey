@@ -1,0 +1,57 @@
+{
+ "schema": "tlc_timetable_set/1",
+ "scenes": {
+  "odyssey_scene011": {
+   "allow_excluded": true,
+   "allow_unobserved": false
+  },
+  "odyssey_scene021": {
+   "allow_excluded": true,
+   "allow_unobserved": false
+  },
+  "odyssey_scene025": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  },
+  "odyssey_scene032": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  },
+  "odyssey_scene052": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  },
+  "odyssey_scene056": {
+   "allow_excluded": true,
+   "allow_unobserved": false
+  },
+  "odyssey_scene060": {
+   "allow_excluded": false,
+   "allow_unobserved": true
+  },
+  "odyssey_scene061": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  },
+  "odyssey_scene067": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  },
+  "odyssey_scene072": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  },
+  "odyssey_scene075": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  },
+  "odyssey_scene081": {
+   "allow_excluded": true,
+   "allow_unobserved": false
+  },
+  "odyssey_scene086": {
+   "allow_excluded": false,
+   "allow_unobserved": false
+  }
+ }
+}

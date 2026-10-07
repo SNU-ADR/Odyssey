@@ -1,0 +1,40 @@
+{
+ "schema": "tl_signal_patch/1",
+ "scene": "odyssey_scene011",
+ "signals": [
+  {
+   "roadblock": "50988",
+   "connectors": [
+    "49662"
+   ],
+   "patches": [
+    [
+     876,
+     980,
+     "G",
+     "camera",
+     {
+      "db": "RU",
+      "heads": [
+       "tl_bulb_38933",
+       "tl_bulb_39209"
+      ],
+      "cameras": [
+       "CAM_F0",
+       "CAM_R0"
+      ],
+      "depth_m": [
+       19.5,
+       40.2
+      ],
+      "box_px": [
+       28,
+       78
+      ],
+      "merged_rows": 0
+     }
+    ]
+   ]
+  }
+ ]
+}

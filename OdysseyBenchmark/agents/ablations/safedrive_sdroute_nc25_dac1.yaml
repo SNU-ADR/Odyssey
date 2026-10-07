@@ -1,0 +1,32 @@
+# Agent config for the Odyssey benchmark. See docs/getting_started.md "Port your model".
+# Paths may use ${VAR} and ~; relative paths are taken from this file's directory.
+# Not a shipped config: it shares safedrive_sdroute.ckpt, so it lives outside OdysseyBenchmark/agents/*.yaml.
+# SafeDrive SD-route ablation in the paper: the SD-route model selecting
+# by imitation (no test-time scoring, so the generic adapter) with the stage-1 DAC weight lowered
+# from 15 to 1; NC 25, imitation 0.5 and W 20 stay, the top 128 of 256 anchors still reach SWNet and
+# the imitation argmax picks the plan. DAC does not tell lanes apart (the opposite lane is
+# "drivable"), so at 15 it keeps wrong-lane candidates; at 0 the signal scenes lose the term that
+# ranks them. Same checkpoint, cameras and route as safedrive_sdroute.
+model:
+  name: safedrive_sdroute_nc25_dac1
+  python: ${ODYSSEY_PLANNER_PY}
+  repo: ${ODYSSEY_ZOO_ROOT}/models/SafeDrive
+  agent_config: safedrive_sdroute_agent
+  checkpoint: ${ODYSSEY_MODELS_ROOT}/models/SafeDrive/ckpts/safedrive_sdroute.ckpt
+  # ++: DAC_2stage_weight is a SafeDrive_Config default that no yaml declares, so a plain override
+  # is refused in struct mode; a misspelt name fails when SafeDrive_Config is built.
+  overrides: ["++config.DAC_2stage_weight=1.0"]
+history_times_s: [-1.5, -1.0, -0.5, 0.0]
+camera_times_s:
+  CAM_F0: [-1.0, -0.5, 0.0]
+  CAM_L0: [-1.0, -0.5, 0.0]
+  CAM_R0: [-1.0, -0.5, 0.0]
+navigation: {driving_command: false, sd_route: features}
+output: {plan_dt: 0.5, shape: [8, 3]}
+feature_shapes:
+  camera_feature: [1, 3, 3, 3, 256, 512]
+  lidar2img: [1, 3, 3, 4, 4]
+  status_feature: [1, 3, 8]
+  ego_poses: [1, 3, 3]
+  route_centerline: [1, 120, 5]
+  route_centerline_mask: [1, 120]

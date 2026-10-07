@@ -1,0 +1,598 @@
+{
+ "schema": "tl_signal_patch/1",
+ "scene": "odyssey_scene081",
+ "signals": [
+  {
+   "roadblock": "49767",
+   "connectors": [
+    "52660"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "49029",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45263",
+   "approach": "49029"
+  },
+  {
+   "roadblock": "50668",
+   "connectors": [
+    "47869",
+    "47870"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "49029",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45263",
+   "approach": "49029"
+  },
+  {
+   "roadblock": "50977",
+   "connectors": [
+    "52736"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "49029",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45263",
+   "approach": "49029"
+  },
+  {
+   "roadblock": "50138",
+   "connectors": [
+    "52913"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "intersection": "45263",
+      "approach": "49193",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45263",
+   "approach": "49193"
+  },
+  {
+   "roadblock": "50239",
+   "connectors": [
+    "52823"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "49401",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "49401"
+  },
+  {
+   "roadblock": "50416",
+   "connectors": [
+    "48083"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "48853",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "48853"
+  },
+  {
+   "roadblock": "50557",
+   "connectors": [
+    "47523",
+    "47524"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "48853",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "48853"
+  },
+  {
+   "roadblock": "50667",
+   "connectors": [
+    "47886"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "48853",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "48853"
+  },
+  {
+   "roadblock": "50883",
+   "connectors": [
+    "52974"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "49401",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "49401"
+  },
+  {
+   "roadblock": "50968",
+   "connectors": [
+    "52198",
+    "52956"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45263",
+      "approach": "49401",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45263",
+   "approach": "49401"
+  },
+  {
+   "roadblock": "51016",
+   "connectors": [
+    "47110",
+    "47111"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "intersection": "45263",
+      "approach": "49193",
+      "ego_approach": "49029"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45263",
+   "approach": "49193"
+  },
+  {
+   "roadblock": "50274",
+   "connectors": [
+    "51919",
+    "52032"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45308",
+      "approach": "49013",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45308",
+   "approach": "49013"
+  },
+  {
+   "roadblock": "50500",
+   "connectors": [
+    "47342",
+    "47343"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45308",
+      "approach": "49013",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45308",
+   "approach": "49013"
+  },
+  {
+   "roadblock": "49662",
+   "connectors": [
+    "52523",
+    "52578"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45308",
+      "approach": "49270",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45308",
+   "approach": "49270"
+  },
+  {
+   "roadblock": "50099",
+   "connectors": [
+    "47907",
+    "47908"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45308",
+      "approach": "36405",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45308",
+   "approach": "36405"
+  },
+  {
+   "roadblock": "50669",
+   "connectors": [
+    "51998",
+    "52072"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "intersection": "45308",
+      "approach": "36992",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45308",
+   "approach": "36992"
+  },
+  {
+   "roadblock": "50775",
+   "connectors": [
+    "53178"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45308",
+      "approach": "49270",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45308",
+   "approach": "49270"
+  },
+  {
+   "roadblock": "50858",
+   "connectors": [
+    "47840",
+    "47841"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "intersection": "45308",
+      "approach": "36992",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45308",
+   "approach": "36992"
+  },
+  {
+   "roadblock": "50939",
+   "connectors": [
+    "52169",
+    "52397"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "R",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45308",
+      "approach": "49270",
+      "ego_approach": "49013"
+     }
+    ]
+   ],
+   "role": "cross",
+   "intersection": "45308",
+   "approach": "49270"
+  },
+  {
+   "roadblock": "51034",
+   "connectors": [
+    "52621",
+    "53231"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45309",
+      "approach": "49407",
+      "ego_approach": "49407"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45309",
+   "approach": "49407"
+  },
+  {
+   "roadblock": "50964",
+   "connectors": [
+    "52732",
+    "52879"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "intersection": "45309",
+      "approach": "49067",
+      "ego_approach": "49407"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45309",
+   "approach": "49067"
+  },
+  {
+   "roadblock": "49732",
+   "connectors": [
+    "52301"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45339",
+      "approach": "49195",
+      "ego_approach": "49195"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45339",
+   "approach": "49195"
+  },
+  {
+   "roadblock": "49909",
+   "connectors": [
+    "48068",
+    "48069"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45339",
+      "approach": "49195",
+      "ego_approach": "49195"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45339",
+   "approach": "49195"
+  },
+  {
+   "roadblock": "50455",
+   "connectors": [
+    "47931",
+    "47932"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "oncoming approach (|heading delta| >= 150 deg): the ego colour on the rows the cross rule patches (ego G -> G, ego R -> R, ego unknown -> DB), no clearance offset (user decision 2026-09-25)",
+      "intersection": "45339",
+      "approach": "36353",
+      "ego_approach": "49195"
+     }
+    ]
+   ],
+   "role": "oncoming",
+   "intersection": "45339",
+   "approach": "36353"
+  },
+  {
+   "roadblock": "50634",
+   "connectors": [
+    "52588",
+    "53009",
+    "53137"
+   ],
+   "patches": [
+    [
+     0,
+     999,
+     "G",
+     "frozen_constant",
+     {
+      "rule": "constant: ego approach G, cross R (user decision 2026-09-25, option b)",
+      "intersection": "45466",
+      "approach": "49003",
+      "ego_approach": "49003"
+     }
+    ]
+   ],
+   "role": "ego",
+   "intersection": "45466",
+   "approach": "49003"
+  }
+ ]
+}

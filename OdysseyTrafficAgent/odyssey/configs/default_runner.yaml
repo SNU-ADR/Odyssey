@@ -1,0 +1,662 @@
+# Modified from WorldEngine (https://github.com/OpenDriveLab/WorldEngine), licensed under Apache-2.0.
+hydra:
+  run:
+    dir: ${output_dir}
+  output_subdir: null                                           # no .hydra/ dump; launch.json records the command
+  searchpath:                                                   # Only <exp_dir> in these paths are discoverable
+    - pkg://odyssey.configs.common
+
+defaults:
+  - default_common
+  - override hydra/job_logging: console                         # stdout only (configs/hydra/job_logging)
+  - _self_
+
+# Image restorer applied to the rendered cameras before the planner sees them.
+#   fixer_h1b16       NVIDIA Fixer fine-tuned for Odyssey -- the default and the benchmark's restorer
+#   fixer_pretrained  NVIDIA Fixer, NVIDIA's released weights
+#   <url>             an already-running restore service
+#
+# The fixer choices start their own worker (the `fixer` interpreter, on GPU ODYSSEY_FIXER_GPU;
+# they run in bf16, so that GPU must support it).
+#
+# An exported ODYSSEY_RESTORER wins when this is not given on the command line; the benchmark
+# launcher always sets it.
+restorer: ${oc.env:ODYSSEY_RESTORER,fixer_h1b16}
+# Also write each camera image as rendered, BEFORE the restorer, next to the restored one:
+# odyssey_output/sensor_blobs_pre_restore/<same data_path as sensor_blobs>. Off by default
+# (it doubles the image bytes of a run); a no-op when no restorer runs.
+save_pre_restore: ${oc.env:ODYSSEY_SAVE_PRE_RESTORE,false}
+# Render only these cameras; empty keeps all 8. A string ("cam_f0,cam_l0,cam_r0") or a list; on
+# the command line it must be the list form, render_cams=[cam_f0,cam_l0,cam_r0], because hydra
+# reads a bare comma list as a sweep and refuses to run.
+# Same switch as the ODYSSEY_RENDER_CAMS env var the renderer reads -- as a config key it can come
+# from the command line, which the env var cannot. An exported ODYSSEY_RENDER_CAMS still wins when
+# this is left empty, so existing launchers are unchanged.
+render_cams: ${oc.env:ODYSSEY_RENDER_CAMS,''}
+# Render cameras only every N-th step, at steps 0, N, 2N ... The world, the plant and scoring
+# still run at every step; the skipped steps simply carry no image, and the frame they write
+# names no file (data_manager blanks data_path for a camera that was not rendered). 1 = every
+# step = current behaviour. Only useful when nothing consumes the images DURING the rollout: a
+# planner reading camera frames would be handed empty views on the skipped steps.
+render_every: 1
+
+data_file_path: null                                                      # the scene's scenario (<scene>/scenario.pkl); required
+
+scene_checkpoint: null                                                    # the scene's Gaussian checkpoint (<scene>/scene.ckpt); required by the renderer
+
+data_output_dir: ${output_dir}
+# Append one line per step (token, timestamp, ego pose, camera files) to <data_output_dir>/frame_index.jsonl.
+# Only useful with the rendered images, so the launcher turns it on with --record.
+record_frame_index: false
+
+# If false, continue running the simulation even it a scenario has failed
+exit_on_failure: false
+
+env: 'base_env'
+
+no_map: false
+store_map: false
+
+ego_vehicle_type: 'pacifica'
+destination: [0, 100]
+ego_controller: 'two_stage_controller'
+ego_policy: 'env_input_policy'
+ego_navigation: 'trajectory_navigation'
+ego_client: 'base_client'
+other_vehicle_type: 'pacifica'
+agent_controller: 'log_play_controller'
+agent_policy: 'trajectory_policy'
+agent_navigation: 'trajectory_navigation'
+
+# Run the ego planner and nuPlan background-traffic solve from the same beginning-of-tick
+# snapshot, then commit both results.  This overlaps a GPU/external E2E planner with CPU IDM and
+# gives IDM only causal ego history; false restores the legacy ego-then-IDM serial ordering.
+parallel_ego_idm: true
+# PDM is only the local stand-in for an external E2E ego planner. Match the production handoff:
+# replay the ego and all background objects from the same GT snapshots for num_history-1 ticks,
+# then initialize PDM/E2E and reactive IDM together. The legacy key name is retained so existing
+# CLI launchers stay valid; disable only for a deliberate from-reset ablation.
+pdm_gt_warmup_enabled: true
+# Background-vehicle initialization protocol.
+#   gt_merge                 replay Ego and traffic from GT during warm-up, then let accepted
+#                            IDM vehicles merge continuously from their last GT pose to the rail.
+#   centerline_snap_warmup   keep Ego on the same GT warm-up, but initialize routable vehicles
+#                            on nuPlan map rails at t=0 and run IDM throughout warm-up.  This
+#                            settles snapped traffic before the first scored closed-loop frame.
+nuplan_idm_initialization_mode: 'gt_merge'
+# Long-window PDM route rail. This consumes GT route geometry only, not future speed or actions;
+# closed-loop PDM still reacts to the simulated world. It avoids artificial stops when a 100 s
+# window contains lane changes/map seams that nuPlan's lane-only Dijkstra cannot represent.
+pdm_gt_reference_centerline_enabled: true
+# Low-speed decisions log the winning proposal's path remainder and selected lead tokens.
+# Diagnostic only: it does not change candidate generation, scoring, or control.
+pdm_stop_diagnostics_enabled: true
+pdm_stop_diagnostics_interval_steps: 10
+# One-shot GT-to-IDM rail-snap audit. It is O(number_of_objects^2) only at the handoff
+# tick and never changes a pose; enable for protocol validation runs, not throughput runs.
+nuplan_idm_handoff_snap_diagnostics_enabled: false
+# At the synchronized GT->reactive boundary, start each safe IDM vehicle at its exact final
+# GT pose and follow a one-time cubic merge onto the selected lane rail.
+nuplan_idm_handoff_smooth_merge_enabled: true
+nuplan_idm_handoff_smooth_merge_max_offset_m: 3.0
+nuplan_idm_handoff_smooth_merge_max_heading_deg: 45.0
+# Initial IDM speed is independent of target_velocity (the desired free-flow speed).
+# Use the actor's mapped source row: non-zero state.velocity first, otherwise pose difference.
+nuplan_idm_initial_speed_sanity_max_mps: 40.0
+# IDM branch choice uses clear local source-log intent by default; no route mode flag.
+# Signal stop lines still control motion even when a RED connector is selected as the route.
+# Routable RigidNodes remain reactive IDM. Builder-refused/unroutable RigidNodes remain
+# visible as sector-shifted source replay instead of silently disappearing; their spawn still
+# passes the permanent ego-overlap/tight-ahead gate below.
+nuplan_idm_vehicle_gt_fallback_enabled: true
+# One switch, two behaviours, for R (nuplan_idm_policy) only. NR (trajectory_policy) never reads
+# this key (agent_manager._static_pin_and_predrop_enabled).
+#   1. Parked vehicles -- VEHICLE, valid on every frame, zero xy motion (or metadata
+#      control_mode=static) -- are static agents not handed to IDM: spawned at reset, pinned to
+#      the log pose, no sector gate or despawn, open-loop obstacles for IDM. Labelled
+#      agent_source_mode='static'.
+#   2. Vehicles that would fail the handoff gate (builder refusal, parked, 3 m/45 deg merge,
+#      non-forward merge) never appear, from warm-up on, instead of being GT-replayed/omitted.
+#      Late admission follows the same rule (unroutable or merge-gate failure = excluded for
+#      good; collision and gap gates retry as before). gt_fallback above is ignored.
+#
+# Why the default is true. With it off, pinned cars enter IDM and propagate can fail on every
+# tick, freezing all traffic at its last pose while the run still ends as "success".
+# Also, since 1 has no despawn, parked cars stay in place after the log ends (e.g. 1000 frames)
+# through the horizon_extension period. NR already behaves this way via _survives_source_end, so
+# only true makes both modes see the same world. false remains only as an ablation escape hatch
+# that reproduces nuPlan's reference behaviour.
+nuplan_idm_static_pin_and_predrop: true
+
+# How background log replay is keyed.
+#   absolute  the log's own clock -- actor row = episode_step. The ego and the traffic
+#             decouple as soon as the policy drives differently from the recording.
+#   hybrid    ego route progress. Ambient traffic shares one clock tau(s); interactive
+#             actors are released on it and then free-run, in PET-coupled platoons.
+#   sector    log replay whose offset is held fixed across a sector of the route and
+#             re-anchored only when the ego enters the next one, so the traffic runs at
+#             the speed it was recorded at instead of at the ego's. No ambient/interactive
+#             split and no platoons: those exist because tau(s) stops with the ego, and
+#             this clock does not. Actors and traffic-light connectors of a sector the ego
+#             has not reached are absent/UNKNOWN until it gets there; once released they
+#             share the same source-row offset.
+#   sector_lead  sector, except a sector's actors come onto the road a margin before the
+#             ego reaches its boundary. With no margin they appear the instant the ego
+#             crosses, which is beside it or already behind it.
+# Only meaningful with agent_policy=trajectory_policy; nuplan_idm_policy does not replay a log.
+agent_replay: 'absolute'
+# Where a sector ends (agent_replay=sector*).
+#   time   fixed stretches of log time, sector_len_s each -- THE DEFAULT
+#   inter  between intersections: the boundary goes halfway between two junction
+#          traversals, so a junction is never cut in half by one. Junctions closer
+#          together than sector_inter_min_m end up in one sector.
+sector_by: 'time'
+sector_len_s: null          # s of log time one sector spans (sector_by=time), null = 20.0
+sector_lead_m: null         # m before a boundary that its actors appear (sector_lead), null = 15.0
+sector_inter_min_m: null    # m, shortest sector sector_by=inter will make, null = 50.0
+sector_inter_approach_m: null  # m from a junction lane that still counts as in it, null = 5.0
+# The four replay_* knobs below tune the ambient/interactive split and the PET
+# platoons, which only agent_replay=hybrid has. agent_replay=sector ignores them.
+replay_tau_interact: null   # m from the ego route, null = 4.0 (a lane)
+replay_static_min: null     # m of net displacement below which an actor is ambient, null = 3.0
+replay_pet_s: null          # s, post-encroachment time that bundles two actors, null = 3.0
+replay_pet_r: null          # m, the patch of road PET is measured over, null = 5.0
+
+# PDM parameters
+nuplan_map_root: ${oc.env:NUPLAN_MAPS_ROOT,null}                 # the nuPlan maps directory (one copy per concurrent run)
+
+# IDM parameters
+DELTA_SPEED : 5                                     # [m/s]
+DISTANCE_WANTED : 2.0                               # Desired jam distance to the front vehicle,
+                                                    # bumper to bumper: desired_gap() adds the two
+                                                    # half-lengths itself, because the distance it is
+                                                    # compared against is centre to centre.
+TIME_WANTED : 1.5  # [s]                            # Desired time gap to the front vehicle.
+DELTA : 4.0                                        # Exponent of the velocity term.
+DELTA_RANGE : [3.5, 4.5]                            # Range of delta when chosen randomly.
+# Lateral policy parameters
+LANE_CHANGE_FREQ : 50   # [step]
+LANE_CHANGE_SPEED_INCREASE : 10
+SAFE_LANE_CHANGE_DISTANCE : 15
+MAX_LONG_DIST : 30
+MAX_SPEED : 100  # km/h
+NORMAL_SPEED : 35  # km/h
+CREEP_SPEED : 5
+ACC_FACTOR : 2.5
+DEACC_FACTOR : -2.5
+
+# nuPlan IDM batch parameters. Declaring them lets Hydra runs override the batch without using
+# the `+key=value` escape hatch, while keeping nuPlan's simulation defaults in one visible place.
+nuplan_idm_midspawn: true
+# R vehicle source row is anchored to its sector opening time and its own first valid
+# PKL row. This preserves the actor's original valid duration; IDM motion still uses
+# simulation time. Once that duration ends, the 50 m source-end retention below applies.
+#   time          simulation tick (legacy/reference behavior)
+#   ego_progress  GT ego row at live ego route progress
+#   sector        first valid actor row + ticks since its sector opened (production)
+nuplan_idm_lifecycle_clock: 'sector'
+# The same sector gate drives R vehicle lifecycle, vulnerable/fallback source replay
+# and traffic-light source rows. NR keeps its existing sector replay behavior.
+# Shared reactive clock: it gates first IDM admission and shifts source replay for vulnerable
+# actors, IDM-fallback RigidNodes, and traffic lights as one intersection cohort.
+nuplan_idm_spawn_eligibility: 'intersection_sector'  # source | intersection_sector
+nuplan_idm_intersection_spawn_lead_m: null  # m, null = sector_lead_m or 15.0
+# Source validity is sensor/log availability, not physical disappearance. Keep admitted IDM
+# vehicles near ego, then retire them permanently after they leave this safety radius.
+nuplan_idm_despawn_on_source_end: false
+nuplan_idm_source_end_keep_radius: 50.0
+# A true IDM graph dead-end despawns any vehicle before its front bumper leaves the rail,
+# even if the source log still shows it. RED/UNKNOWN successors are temporary waits, not
+# dead-ends; scene-excluded connectors do not count as usable successors. Keep this legacy
+# option name for old run configurations; enabled is the production behavior.
+nuplan_idm_source_end_route_exhaustion_despawn_enabled: true
+nuplan_idm_source_end_route_exhaustion_margin_m: 0.5
+# Liveness valve. A source-ended IDM vehicle remains retained while moving, but cannot stay
+# inside the safety radius forever without making physical progress.
+nuplan_idm_source_end_liveness_enabled: true
+nuplan_idm_source_end_stall_timeout_s: 8.0
+nuplan_idm_source_end_progress_epsilon_m: 0.5
+# Legacy ablation only when route-exhaustion despawn above is disabled: append a straight
+# egress tail for a source-ended vehicle at a true map edge. Production never uses this.
+# A lane with traffic-light-controlled successors is never extended through a red signal.
+nuplan_idm_source_end_route_extension_enabled: false
+nuplan_idm_source_end_route_extension_length_m: 100.0
+nuplan_idm_source_end_route_extension_trigger_m: 20.0
+# A vehicle that already outlived its source track and then holds an intersection without
+# 0.5 m of progress for the manager timeout can be retired. Unlike broad stall liveness, this
+# cannot delete a still-observed red-light or queue wait.
+nuplan_idm_source_ended_active_stall_relief_enabled: true
+# Map-scoped relief for the audited Boston lane whose graph truly ends at 51717. This is
+# deliberately not a general stuck-despawn rule: no other map/lane is eligible, and the
+# vehicle must be source-ended, stopped, and physically at the terminal boundary.
+nuplan_idm_dead_end_queue_relief_enabled: true
+nuplan_idm_dead_end_queue_relief_map: us-ma-boston
+nuplan_idm_dead_end_queue_relief_lane_ids: [51717]
+nuplan_idm_dead_end_queue_relief_timeout_s: 4.0
+nuplan_idm_dead_end_queue_relief_progress_epsilon_m: 0.5
+nuplan_idm_dead_end_queue_relief_stopped_speed_mps: 0.5
+nuplan_idm_dead_end_queue_relief_trigger_m: 5.0
+nuplan_idm_dead_end_queue_relief_follower_distance_m: 30.0
+# The audited terminal has no legal continuation, so retire the final vehicle as well as a
+# queued lead. This prevents the last source-ended body from becoming a permanent map prop.
+nuplan_idm_dead_end_queue_relief_require_follower: false
+# Opt-in object-class exception for precisely identified map segments. An IDM vehicle whose
+# physical body is on one of these audited circular/dead-end rails ignores non-vehicle
+# open-loop detections and manager/signal virtual stop-lines. Physical vehicles and ego remain
+# effective and are ordered by forward progress along the remaining route. The feature is
+# disabled by default so pedestrians, cyclists and traffic control retain their normal behavior
+# everywhere else.
+nuplan_idm_vehicle_only_lead_enabled: false
+nuplan_idm_vehicle_only_lead_map: ""
+# Audited Las Vegas circular movements. Their tightly curved rails cross tiny
+# GENERIC_OBJECT detections and are split into short connector records that the
+# intersection manager can otherwise treat as fresh FIFO conflicts. Within these
+# exact segments, vehicles and ego remain physical leads and are ordered by path-s.
+# The latter three chains cover the complete path a stalled vehicle occupies, rather than
+# only its instantaneous connector polygons.
+nuplan_idm_vehicle_only_lead_lane_ids: [68604, 63186, 69471, 67479, 68806, 67133, 65388, 68597, 70330, 68585, 68835, 68560, 68588, 68999, 67875, 65370, 68584, 68605, 69422, 67877, 65374, 68564, 70360]
+# Simulator-side NPC admission policy. Disabled is the exact baseline; enable it only on the
+# pilot branch/run. The manager receives no ego route, HLC, future trajectory, or planner output.
+nuplan_idm_intersection_manager_enabled: false
+nuplan_idm_intersection_reaction_margin_s: 0.7
+nuplan_idm_intersection_distance_margin_m: 3.0
+nuplan_idm_intersection_stop_offset_m: 1.0
+nuplan_idm_intersection_downstream_margin_m: 2.0
+nuplan_idm_intersection_ego_horizon_s: 1.5
+nuplan_idm_intersection_ego_margin_m: 0.75
+nuplan_idm_intersection_stopped_rear_ego_release_distance_m: 15.0
+nuplan_idm_intersection_stopped_rear_ego_release_lateral_m: 3.0
+# V2 admits multiple NPCs only when their buffered route-rail corridors are disjoint.
+# Set false to reproduce the conservative V1 whole-intersection serialization pilot.
+nuplan_idm_intersection_allow_non_conflicting_movements: true
+# Preserve stock IDM at lone/uncontended entries; arm the shield when NPC movements compete.
+# Set false for strict V1/V2 admission and downstream checks at every candidate entry.
+nuplan_idm_intersection_contention_only: true
+# Keep stock stop-line behavior for red signals, while serializing only conflicting
+# connector movements that are simultaneously reported green.
+nuplan_idm_intersection_protect_signal_conflicts: false
+# If every recorded signal in the current scene frame becomes UNKNOWN, stock nuPlan cannot
+# extend an IDM route through any traffic-light connector and the fleet stops forever. With the
+# intersection manager enabled, downgrade those physical intersections to unsignalized
+# FIFO/corridor rules. Any remaining RED/GREEN/YELLOW keeps the normal signal behavior.
+nuplan_idm_unknown_signal_unprotected_fallback_enabled: true
+nuplan_idm_intersection_wait_bonus_per_tick: 0.01
+nuplan_idm_intersection_stall_timeout_s: 8.0
+nuplan_idm_intersection_progress_epsilon_m: 0.5
+# Opt-in last-resort liveness valve for a vehicle physically stopped inside an
+# unsignalized junction. The manager retires it only after the progress timeout.
+nuplan_idm_intersection_stall_liveness_enabled: false
+nuplan_idm_intersection_reservation_commit_distance_m: 2.0
+nuplan_idm_intersection_reservation_ttl_s: 2.0
+nuplan_idm_intersection_log_interval_ticks: 100
+# Late-spawn collision safeguard using current physical boxes and velocities only.
+nuplan_idm_spawn_crossing_horizon_s: 1.0
+nuplan_idm_spawn_crossing_sample_dt: 0.1
+nuplan_idm_spawn_rail_conflict_lookahead_m: 100.0
+# `footprint_overlap_only` reproduces the root exact-log lifecycle baseline. The default keeps
+# projected-footprint, braking-gap and short current-state crossing checks.
+nuplan_idm_spawn_gate: conservative
+# The log-replay analogue of the gate above, for `agent_policy: trajectory_policy`.
+#
+# A GT actor appears on the frame its log says, but the log chose that frame against the
+# logged ego, and ours is model-driven. The two sources together can place an actor inside
+# the ego -- a pair of poses that never occurred and, with no physics to separate them,
+# does not resolve: the scorer then charges the ego an at-fault collision it had no way to
+# avoid. In our rollouts about one in nine at-fault contacts began on such a spawn.
+#
+# The actor is then not spawned, not scored and not rendered -- one decision carried to all
+# three, since the renderer draws from the same checkpoint poses the scorer collides on and
+# would otherwise keep drawing an actor the simulation does not have.
+#
+# Overlap only -- "too close" is a judgement the recording never made -- and only against
+# the ego, since replayed actors routinely overlap each other and always did so in the log.
+#
+# On by default. Turning it off changes which actors are scored, so runs with and without it
+# are different measurements and should not be compared line by line.
+trajectory_spawn_ego_overlap_gate: true
+# What an overlapping spawn costs the actor, once the gate above is on.
+#
+#   drop   (default) the actor is gone for the rest of the rollout. The row the log chose
+#          for its first appearance is the only one the recording actually contains, so
+#          an entry that cannot be honoured there is abandoned rather than moved to a
+#          moment that was never recorded. One decision per actor, and the set of scored
+#          actors is then fixed for the whole rollout.
+#   defer  the actor waits and enters at the first step its pose is clear of the ego, or
+#          never, if its log window closes first. Recovers most of what drop discards, but
+#          their entry row is not the one the log recorded.
+#
+# Either way the actor is absent from simulation, scoring and the rendered image alike.
+# Any unrecognised value drops: it is the conservative outcome and the default.
+trajectory_spawn_ego_overlap_action: drop
+# A spawn can be disjoint yet still leave the closed-loop ego no physically meaningful
+# reaction distance.  Reject such an actor permanently when its centre is in the ego-width
+# corridor and its front bumper gap is below this threshold.  This applies to reactive-sector
+# replay actors and IDM admissions as well as ordinary trajectory replay.
+spawn_ego_tight_ahead_gate: true
+spawn_ego_tight_ahead_gap_m: 5.0
+spawn_ego_tight_ahead_lateral_margin_m: 0.5
+# Optional symmetric extension of the late-IDM braking-gap test to already-published GT-replay
+# vehicles. Focused A/B testing found no additional collision reduction, so leave it off; the
+# GT-replay vehicle's own first-publication safety gate below remains enabled independently.
+nuplan_idm_late_spawn_open_loop_braking_gap_enabled: false
+# A low-motion vehicle entering GT replay must leave enough current-state braking room for a
+# reactive follower. A refusal is retried 0.1 s later and never permanently deletes the track.
+nuplan_idm_source_motion_spawn_braking_gap_enabled: true
+# Keep late IDM insertions out of an ego-aligned same-lane corridor.  The forward bumper gap is
+# based on the ego's reaction + emergency-braking distance, while the rear keeps a fixed minimum;
+# the existing relative-speed braking gate below can still demand more room from a fast follower.
+# This applies only to the conservative gate, so the exact-log footprint-only lifecycle remains
+# an unchanged baseline.
+nuplan_idm_ego_lane_spawn_clearance_enabled: true
+nuplan_idm_ego_lane_spawn_reaction_time_s: 1.0
+nuplan_idm_ego_lane_spawn_stopping_distance_multiplier: 3.0
+nuplan_idm_ego_lane_spawn_front_min_m: 15.0
+nuplan_idm_ego_lane_spawn_rear_m: 20.0
+nuplan_idm_ego_lane_spawn_heading_tolerance_deg: 30.0
+nuplan_idm_ego_lane_spawn_lateral_margin_m: 0.5
+# Optional legacy ablation. Keeping a parked vehicle at its logged pose makes it open-loop, so
+# production leaves this disabled and keeps every admissible vehicle reactive.
+nuplan_idm_parked_vehicle_fallback_enabled: false
+nuplan_idm_parked_vehicle_speed_threshold_mps: 0.5
+nuplan_idm_parked_vehicle_snap_distance_m: 2.0
+nuplan_idm_parked_vehicle_max_track_displacement_m: 3.0
+nuplan_idm_parked_vehicle_min_valid_samples: 3
+# Experimental CKPT-track motion gate. Zero preserves normal IDM admission. When positive,
+# only vehicles whose maximum displacement from their first valid source pose reaches this
+# threshold become reactive; the remainder continue as exact GT open-loop objects.
+nuplan_idm_reactive_min_source_displacement_m: 0.0
+nuplan_idm_unstable_short_track_filter_enabled: true
+nuplan_idm_unstable_short_track_max_valid_samples: 2
+nuplan_idm_unstable_short_track_max_displacement_m: 1.0
+nuplan_idm_unstable_short_track_heading_jump_deg: 90.0
+
+# Optional long-horizon evaluation controls. Defaults preserve normal benchmark termination.
+sd_route_departure_guard_enabled: true
+hopeless_stall_early_stop_enabled: false
+hopeless_stall_min_elapsed_s: 100.0
+hopeless_stall_window_s: 60.0
+hopeless_stall_max_travel_m: 1.0
+hopeless_stall_max_speed_mps: 0.2
+# Read-only true-deadlock diagnostic. It swaps in a propagation-equivalent instrumented IDM
+# manager only when enabled (the intersection manager enables it automatically).
+nuplan_idm_wait_cycle_monitor_enabled: false
+# A reciprocal physical-lead cycle is not a normal queue: neither car can move until one is
+# explicitly given priority. Two seconds filters transient yielding without entering the stuck
+# metric window; only one cycle edge is relaxed and the other car remains a physical blocker.
+nuplan_idm_wait_cycle_timeout_s: 2.0
+# A committed junction vehicle and a stopped ego can otherwise remain in a
+# cross-path projection deadlock until liveness retirement.  This shorter timer
+# lets the already-admitted vehicle clear first; all non-ego obstacles stay live.
+nuplan_idm_ego_deadlock_timeout_s: 1.0
+nuplan_idm_wait_cycle_stopped_speed_mps: 0.5
+# Extra clearance compensating for oriented-box corners on curved lane rails. Applied
+# only to the path-ranked current physical lead, not cross-traffic admission geometry.
+nuplan_idm_physical_lead_margin_m: 0.0
+# The first IDM propagate exception fails the run. The cause is recorded in the ERROR log,
+# <data_output_dir>/idm_failure.json and the reported failure reason (IDM_PROPAGATE_FAILED ...).
+# false swallows it and continues from the last pose; use it only for ablations.
+nuplan_idm_fail_on_propagate_error: true
+# Reactive-agent solve cadence. 0.1 preserves the existing fine-grained adapter. Set 0.5
+# to run nuPlan at the source scenario cadence while exposing interpolated poses at 10 Hz.
+nuplan_idm_solve_dt: 0.1
+# PDM query cadence. The ego controller and plant still advance at rollout_dt on skipped
+# planner ticks, consuming the next waypoint from the last time-parameterized trajectory.
+pdm_plan_dt: 0.1
+# Explicit experiment-only scale for the ego PDM proposal speeds.  This scales PDM's
+# speed-limit fractions and no-map fallback target; it does not affect background NPC IDM.
+pdm_speed_scale: 1.0
+# Preserve PDM-Closed's full +/-1 m collision-avoidance envelope. The optional selector-only
+# lane-keeping weight softly prefers the centerline in ordinary driving. 0.1 passed the focused
+# 11-scene regression pilot; MetricManager always constructs its reporting scorer
+# with the reference 0.0 weight, so reported PDM/DS definitions do not move.
+pdm_lateral_offsets: [-1.0, 1.0]
+pdm_lane_keeping_weight: 0.1
+nuplan_idm_target_velocity: 10.0
+nuplan_idm_min_gap_to_lead_agent: 1.0
+nuplan_idm_headway_time: 1.5
+nuplan_idm_accel_max: 1.0
+nuplan_idm_decel_max: 2.0
+# Preserve nuPlan's 2.0 m/s^2 comfortable-deceleration term in the IDM desired-gap formula,
+# but permit up to 0.5 g when that formula requests harder braking.
+nuplan_idm_emergency_decel_max: 4.905
+nuplan_idm_minimum_path_length: 20.0
+nuplan_idm_radius: 100.0
+tracker: 'lqr'
+# PDM is a reference baseline, so use nuPlan's published LQR gains for it. This switch affects
+# only ego_policy=pdm_policy; other planners retain the repository's tuned gains below.
+pdm_reference_lqr: true
+# LQR tuning
+q_longitudinal: [10.0]      # velocity tracking cost gain
+r_longitudinal: [1.0]       # acceleration tracking cost gain
+# Tuned gains; the upstream values are in the trailing comments.
+q_lateral: [104.0, 1.0938, 0.0]  # [lateral_error, heading_error, steering_angle] tracking cost
+                                 # gains. upstream shipped [5.0, 10.0, 1.0]
+r_lateral: [1.0]            # steering_rate tracking cost gain. upstream shipped [3.0]
+tracking_horizon: 10        # LQR look-ahead, in CONTROL_DT steps (defines.py). PS: need to be
+                            # changed in different policy.
+
+# Parameters for velocity and curvature estimation.
+jerk_penalty: 1e-4            # Penalty for jerk in velocity profile estimation.
+curvature_rate_penalty: 1e-2  # Penalty for curvature rate in curvature profile estimation.
+
+# Stopping logic
+stopping_proportional_gain: 0.5 # Proportional controller tuning for stopping controller
+stopping_velocity: 0.2          # [m/s] Velocity threshold for stopping
+
+motion_model: 'kinematic_bicycle'
+accel_time_constant: 0.2  # low pass filter time constant for acceleration in s
+steering_angle_time_constant: 0.05  # low pass filter time constant for steering angle in s
+
+# Actuator-lag bypass switches. Each filter is  x_new = x + dt/(dt+tau)*(cmd - x), so turning one
+# off is exactly its tau -> 0 limit (gain 1, command realised this step) -- implemented as a flag
+# rather than tau=0 so it cannot be confused with "a very small tau", which still leaves a
+# dt-dependent residue.
+#
+# Purpose is DIAGNOSTIC, for direct control in particular: there the model's (accel, kappa) is the
+# command, so a normal rollout confounds what the head predicted with what the plant's lag did to
+# it. With these on, the ego tracks the commanded control instantly and the head is isolated.
+#
+# NOT more realistic -- real actuators lag, and navsim's reference plant (the one the planners were
+# trained and tuned against) lags too, so scores from a no-lag run are not comparable to normal
+# runs.
+no_accel_lag: false           # true -> commanded acceleration applies immediately
+no_steering_lag: false        # true -> steering angle reaches its target angle immediately
+
+# Plant sub-steps per outer step. null (default) DERIVES it as outer step / CONTROL_DT, which is
+# the only value that makes the bicycle integrate at the period the LQR gains were tuned for
+# (tracking_horizon=10 over CONTROL_DT). N re-solves the tracker AND integrates the bicycle N times
+# per outer step at (outer step)/N; it does NOT change how far the ego travels per outer step.
+# Set a number only to vary it in a tuning experiment. A value of 1 would integrate a 0.5 s outer
+# step as a single 0.5 s Euler step, which is too coarse and accumulates lateral drift on turns.
+two_stage_substeps:
+
+# Visualization
+visualize_BEV: false
+visualize_video: false
+save_data: false
+
+# Planner
+use_planner_actions: false
+
+# Render Manager
+with_render_manager: true
+# Optional per-scene representative-frame policy produced by tl_control/build.py.
+# null is an exact no-op: the key is not published and the renderer keeps natural replay.
+tl_control_path: null
+# Opt-in list of scenes (e.g. [odyssey_scene011]) that may use tl_control although they are on the audited
+# runtime denylist tl_control.TL_CONTROL_SCENE_EXCLUSIONS. Empty = the denylist applies unchanged.
+# A bypass logs one warning and is recorded in the trace (exclusion_overridden, exclusion_reason).
+tl_control_allow_excluded: []
+# Opt-in (default false = exact current behaviour). When true, every node head with representative
+# frames (and not keep_natural) is always drawn from a pinned frame -- same frame, DB colour, last
+# pinned frame, or lookahead -- instead of natural playback or hold_frame. Trace reasons "pin:*";
+# startup log "[tl-control] pin_uncontrolled=on".
+tl_control_pin_uncontrolled: false
+# Opt-in (default null): camera-verified signal timetable (tl_signal_patch/1: a directory of <scene>.json or one
+# file, e.g. OdysseyBenchmark/data/tlc_timetable/odyssey_scene032.json). Written into the scene's traffic_light_state rows at
+# load (ScenarioManager), so planner, IDM, rewards, metric, TLC snapshot and tl_control read the same colour.
+# Startup log "[tl-patch] scene=... sha=... spans=N"; npz keys tl_patch_sha256 / tl_patch_json /
+# tlc_signal_patched*. Render-only edge rules when set: row -1 draws the sector's spawn-row colour, rows past
+# the log hold the last row.
+tl_signal_patch_path: null
+# Opt-in one-key preset (default null = exact current behaviour): a timetable directory name under
+# tlc_timetable_sets_dir (the benchmark: tlc_timetable) or a path to a timetable directory. For a scene listed in the set it
+# sets tl_signal_patch_path (<set>/<scene>.json) and tl_control_pin_uncontrolled=true, and adds the scene to
+# tl_control_allow_excluded when the set says so; tl_control_path must name the scene's own published
+# tl_control.json (the benchmark launcher passes it). A scene not in the set is unchanged. Explicitly set keys win (the allow list is combined). Unknown name or
+# malformed set -> ValueError at scene load. Startup log "[tlc-set] scene=... set=... sha=..." (or
+# "... is not in set ...: no-op"); render trace key tlc_timetable_set. See manager/tlc_timetable_set.py.
+tlc_timetable_set: null
+# Where a tlc_timetable_set NAME is looked up (null = odyssey/data/tlc_timetable, which ships no set). The
+# benchmark launcher passes OdysseyBenchmark/data, which holds its one timetable, tlc_timetable/.
+tlc_timetable_sets_dir: null
+# Record-level RouteDS rules (default null = scored without them). The benchmark fixes them
+# (OdysseyBenchmark/odyssey_runtime/launch.py) and the launcher passes them; they are pinned into the run's
+# driving_inputs_json['rules'] and applied by driving_metrics.apply_rules at scene end and on every rescore.
+#   tl_set    a timetable (the benchmark: tlc_timetable): only its designated signal scenes are traffic-light scored,
+#                against the set's timetable (the run must be driven with tlc_timetable_set = the same set);
+#                every other scene gets P_TL 1.0.
+#   plc_rule plc: DS x 0.7^fail x 0.9^late over the lane-choice stop lines the ego reached.
+tl_set: null
+plc_rule: null
+
+# Data Manager
+with_data_manager: true
+# Also write each actor's and signal's replay row into every planner frame (source_rows,
+# signal_rows) -- for a planner-side oracle that must know where the actors will be
+# (odyssey_bridge planners/safedrive.py, *_oracle). Off: frames are unchanged.
+export_source_rows: false
+
+# Metric Manager
+with_metric_manager: false
+# The scorer the metric manager records for and scores with: a dotted module path (see
+# manager/metric_manager.py SCORER_API). Required when with_metric_manager is on; the benchmark
+# launcher passes odyssey_benchmark.scorer.
+scorer: null
+# Both are SIM-step counts, so both depend on rollout_dt (0.1 s below => stride 5).
+#
+# num_history is a MODEL constant expressed in sim steps: navsim agents are trained on 4 history
+# frames 0.5 s apart (ipc_common.NUM_HISTORY_FRAMES), so the warm-up buffer is (4-1)*stride + 1 --
+# 16 at 0.1 s, 4 at the native 0.5 s. It must satisfy (num_history - 1) % stride == 0 or
+# MetricManager refuses to start: grading begins at frame (num_history - 1) and a value that does
+# not divide puts the handoff off the scoring grid.
+#
+# num_future is NOT a constant -- it is the rollout LENGTH, which differs per scenario (a 20 s
+# w40 token has log_length 40, an 80 s OmniRe token 1592). The launcher (OdysseyBenchmark/odyssey_runtime/launch.py)
+# derives it per scene from the reconstruction envelope and the GT-duration budget and always
+# passes it explicitly, so this value is only a floor for callers that pass nothing.
+num_history: 16
+num_future: 8
+
+# Replan every K outer steps. 1 (default) = every step: render == replan == outer step. K > 1
+# keeps the world, the renderer and the plant at rollout_dt but lets the ego coast K-1 steps on
+# the last adopted plan -- e.g. rollout_dt=0.1, K=5 is 2 Hz replanning on a 10 Hz world. It is
+# the only way to get that on 10 Hz scenes: an outer step longer than the scene frame (0.5 s on
+# 0.1 s frames) is refused by resolve_cadence. Read by PlannerClient.get_trajectory.
+replan_horizon_sim_steps: 1
+
+# How many times `num_history + num_future - 1` the rollout may run for.
+#
+# 1.0, NOT 2.0, because num_future ALREADY carries the 2x: the closed-loop duration policy is "2x the
+# GT drive time, or until SD-route completion/departure", and the launcher applies the 2x when it
+# derives num_future. A 2.0 here would multiply the result again (e.g. a 20 s GT drive: num_future
+# 400, horizon 415, budget 830 steps = 83 s = 4.2x the drive). The budget is only spent by a run that
+# needs it: done_function() ends the rollout at the SD-cropped goal, or on SD-route departure.
+gt_budget_multiplier: 1.0
+
+# Optional TLC-only test input: JSON {scene_id: {connector_id: [true, false, null]}}.
+# Arrays use 0.5 s score frames from scene start; false means red cannot be rendered.
+# When unset, the scene's traffic_light_red_renderable payload is used if present.
+# Missing/null flags are unknown and never waive a violation. TLC stays outside the PDM
+# score; its filtered event count contributes 0.7^n to RouteDS (P_TL).
+tlc_render_sanity_override_path: null
+# Keep GT TLC as an audit column, but do not grant the human-violation waiver
+# unless this switch is deliberately enabled.  Renderer sanity is the only default waiver.
+tlc_apply_gt_filter: false
+# Keep raw NAVSIM-style red-connector contacts, then filter only an actually completed
+# near-side exit branch (right on US maps, left on Singapore maps).  The branch is selected
+# from the executed post-contact ego trajectory; merely touching an overlapping turn polygon
+# cannot grant the waiver.
+tlc_apply_nearside_turn_filter: true
+
+# Spawn the ego one (or more) lanes to the side of where the log started it, then let the rollout
+# run closed loop from there. The point is to ask whether the planner gets back onto the route it
+# is supposed to drive, so `object_track` is deliberately NOT touched: it stays the GT reference
+# that RC / route_completion / done_function grade against, and a shifted start therefore
+# shows up as a recovery to be measured rather than as a moved goalpost.
+#
+# The initial SPEED is left exactly as the log had it -- only the pose moves.
+#
+# A SIGNED LANE COUNT in the ego's own heading frame at step 0:
+#
+#     +2   two lanes left      0   the logged lane (default, exact no-op)
+#     +1   one lane left      -1   one lane right      -2   two lanes right
+#
+# Out of range raises -- that is a typo. A road that simply HAS fewer lanes than asked for does
+# not raise: it warns and runs in the logged lane, so a sweep over -2..+2 still yields a row for
+# every scene. That fallback makes the row indistinguishable from a real shift=0 row by its
+# numbers alone, so read the "[start-lane-shift]" line (or EgoAgent.start_lane_shift_applied),
+# never the requested value, when labelling a result.
+ego_start_lane_shift: 0           # -2 | -1 | 0 | 1 | 2
+
+# Hand the rollout to the planner at a different SPEED than the log's. The warm-up (the first
+# num_history-1 steps, before the planner is queried) normally replays the log's own timing; with
+# this set it replays the same logged PATH at a constant mean(log speed over the warm-up) + delta,
+# and the ego spawns already at that speed with zero acceleration. At handoff the planner sees a
+# history and an ego_dynamic_state that both say "faster/slower than the log", on the log's path.
+#
+# m/s, signed, 0.0 = exact no-op. object_track is untouched, so the run is graded against the same
+# drive as its delta=0 twin. A target that would come out negative (slower on a scene whose log is
+# stopped) warns and runs the log's warm-up; read the "[start-speed]" line, not this value,
+# when labelling a result. Combines with ego_start_lane_shift: the path is translated onto the
+# shifted lane and replayed at this speed.
+ego_start_speed_delta: 0.0
+
+# Hand the rollout to the planner MID-ACCELERATION. The ego keeps the log's start speed v0, and the
+# warm-up replays the logged PATH with speed v0 + a*t, a = mean(log acceleration over the warm-up)
+# + delta. At handoff the planner sees speed v0 + a*T and a non-zero acceleration in
+# ego_dynamic_state -- the part ego_start_speed_delta (zero handoff acceleration) cannot probe.
+#
+# m/s^2, signed, 0.0 = exact no-op. Exclusive with ego_start_speed_delta (both set raises). A ramp
+# that would reach negative speed before handoff (any negative delta on a scene whose log is
+# stopped) warns and runs the log's warm-up; read the "[start-accel]" line, not this value.
+ego_start_accel_delta: 0.0
+# Closed-loop rollout granularity -- THE one cadence knob. Rendering, re-planning, the background
+# agents and the plant all advance together at this period, and everything else is derived from
+# it: the plant substeps, the LogPlay index stride, the scoring stride, and num_history above.
+#
+# The default is 0.1, not null. The launcher reads this key instead of assuming a default
+# cadence, and any new caller must do the same.
+#
+#   0.1   the real 0.1 s closed loop. ScenarioManager upsamples every GT track by
+#         S=round(native_dt/rollout_dt)=5 (agents move every 0.1 s) and divides sample_rate by S
+#         so sim_dt becomes 0.1 s. The planner still gets 0.5 s-spaced history (ODYSSEY_HISTORY_STRIDE
+#         = 5) and PDM still scores at 0.5 s (metric_manager scores every S-th step).
+#   null  step at the scenario's own frame spacing (sample_rate*0.05 = 0.5 s for the MTGS sets).
+#         num_history above must move with it -- the two are only coherent as a pair.
+rollout_dt: 0.1
+# --- LogPlayController temporal-window fusion (jerk reduction for the 0.1 s true closed loop) ---
+# The teleport controller executes the planner's predicted next pose each step; at a 0.1 s rollout,
+# step-to-step disagreement between successive fresh predictions of the SAME future pose shows up as
+# jerky accel/decel. Fuse the last `fusion_window` steps' predictions of that one next pose (aligned
+# by index: newest traj -> waypoints[1], the traj k steps old -> waypoints[1+k], all targeting t+dt):
+#   fusion_mode  none (execute waypoints[1] only, original) | mean (equal avg) | weighted (w_k=fusion_decay**k)
+#   fusion_space position (average absolute predicted positions; blends stale far-horizon predictions
+#                -> the target drifts, can leave the road / collide) | velocity (average each
+#                prediction's per-step displacement, applied to the ego's CURRENT position -> no drift)
+# Only LogPlayController reads these. Every step is a planning step, so every entry is fresh.
+fusion_mode: none
+fusion_space: position
+fusion_window: 5
+fusion_decay: 0.5
+# Closed-loop driving_command source (A/B of the command fed to the planner):
+#   log           (default) replay the log's per-frame GT-derived command.
+#   log_progress  the log's own stored label, indexed by WHERE THE EGO IS along the logged drive
+#                 instead of by the clock: project the live ego onto the logged track, read that
+#                 frame's label. Needs no route at run time. The log's `unknown` labels are
+#                 filled from the GT track. Every frame carries driving_command_source.
+#   log_hold      scan the whole scenario log; if any frame is left/right, hold it for every frame
+#                 (scene constant). Never flips but maximal staleness.
+# See DataManager.
+driving_command_mode: log
+
